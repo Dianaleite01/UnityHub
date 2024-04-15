@@ -9,6 +9,8 @@
         public string Telefone { get; set; }
         public string Email { get; set; }
         public string Site { get; set; }
+        public string CodPostal { get; set; }
+
 
         // Relacão com Voluntariado 
         public ICollection<Voluntariado> Voluntariados { get; set; }

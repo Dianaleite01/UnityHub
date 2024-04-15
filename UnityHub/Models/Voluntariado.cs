@@ -2,12 +2,12 @@
 {
     public class Voluntariado : Utilizador
     {
-        public string AreaDeInteresse { get; set; }
-        public string Habilidades { get; set; }
-        public string Disponibilidade { get; set; }
-        public string Biografia { get; set; }
+        public string Data { get; set; }
+        public string Local { get; set; }
+        public string Descricao { get; set; }
 
         // Relacionamentos
-        public ICollection<Candidatura> Candidaturas { get; set; }
+        public int OrganizacaoId { get; set; }
+        public Organizacao Organizacao { get; set; }
     }
 }
