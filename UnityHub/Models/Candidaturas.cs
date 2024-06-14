@@ -17,11 +17,11 @@ namespace UnityHub.Models
         public string Estado { get; set; }
 
         /// <summary>
-        /// Chave Estrangeira para o Voluntariado
+        /// Chave Estrangeira para a Vaga
         /// </summary>
-        [ForeignKey("Voluntariado")]
-        public int VoluntariadoFK { get; set; }
-        public Voluntariados Voluntariado { get; set; }
+        [ForeignKey("Vaga")]
+        public int VagaFK { get; set; }
+        public Vagas Vaga { get; set; }
 
 
         /// <summary>

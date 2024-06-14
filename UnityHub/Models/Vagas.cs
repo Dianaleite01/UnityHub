@@ -2,7 +2,7 @@
 
 namespace UnityHub.Models
 {
-    public class Voluntariados
+    public class Vagas
     {
         /// <summary>
         /// Chave Primária (PK)
@@ -37,5 +37,7 @@ namespace UnityHub.Models
         // Relacionamento N-M com Candidaturas (um Voluntariado pode ter várias candidaturas)
         public ICollection<Candidaturas> ListaCandidaturas { get; set; }
 
+        // Relacionamento M-N com Categoria
+        public ICollection<Categorias> Categorias { get; set; }
     }
 }

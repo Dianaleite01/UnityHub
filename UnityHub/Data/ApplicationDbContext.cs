@@ -58,6 +58,12 @@ namespace UnityHub.Data
             //associacao do 'admin' a role 'Admin'
             modelBuilder.Entity<IdentityUserRole<string>>().HasData(
                 new IdentityUserRole<string> { RoleId = "admin", UserId = "admin" });
+
+            modelBuilder.Entity<Vagas>()
+                .HasMany(c => c.Categorias)
+                .WithMany(v => v.VagasCategorias)
+                .UsingEntity(j => j.ToTable("VagaCategoria")); // Nome da tabela de associação opcional
+
         }
 
         /* ********************************************
@@ -65,7 +71,8 @@ namespace UnityHub.Data
          * ******************************************** */
 
         public DbSet<Utilizadores> Utilizadores { get; set; }
-        public DbSet<Voluntariados> Voluntariados { get; set; }
+        public DbSet<Vagas> Vagas { get; set; }
         public DbSet<Candidaturas> Candidaturas { get; set; }
+        public DbSet<Categorias> Categorias { get; set; }
     }
 }

@@ -60,7 +60,7 @@ namespace UnityHub.Models
         public ICollection<Candidaturas> Candidaturas { get; set; }
 
         // Relacionamento M-N com Voluntariados (um Utilizador pode estar associado a vários voluntariados)
-        public ICollection<Voluntariados> ListaVoluntariados { get; set; }
+        public ICollection<Vagas> ListaVagas { get; set; }
 
 
     }
