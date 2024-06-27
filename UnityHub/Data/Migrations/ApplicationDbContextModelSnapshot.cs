@@ -268,16 +268,16 @@ namespace UnityHub.Migrations
                         {
                             Id = "admin",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "024b333d-d395-4641-acac-cdc51e053362",
+                            ConcurrencyStamp = "5ab123e8-9912-4370-a422-4cd57ed2cbf4",
                             Email = "admin@UnityHub.pt",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NomeUtilizador = "Administrador",
                             NormalizedEmail = "ADMIN@UnityHub.PT",
                             NormalizedUserName = "ADMIN@UNITYHUB.PT",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDVVq3y/RPbERroy+iOlzFGyBF/iEegODY0XioAiE3jHub2eULAHiqXKwWTrlnYi0A==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDrx/QIyadywH9abkx5bsFU+4+3hvO43b5dt5DqTjx+wNExHl9BvjQEwZH9vXdTEpw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "c37a33ca-4278-4745-9db7-3ce58e8c22d8",
+                            SecurityStamp = "9684e5d8-bf2c-42f4-b858-f19792036486",
                             TwoFactorEnabled = false,
                             UserName = "admin@UnityHub.pt"
                         });
