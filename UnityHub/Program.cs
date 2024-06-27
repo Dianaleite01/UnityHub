@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using UnityHub.Controllers;
 using UnityHub.Data;
 
 var builder = WebApplication.CreateBuilder(args);
