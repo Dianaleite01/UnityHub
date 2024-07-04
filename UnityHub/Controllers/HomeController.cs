@@ -6,14 +6,23 @@ namespace UnityHub.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        public IActionResult Index()
         {
-            _logger = logger;
+            return View();
         }
 
-        public IActionResult Index()
+        public IActionResult About()
+        {
+            ViewData["Title"] = "Sobre";
+            return View();
+        }
+
+        public IActionResult Contact()
+        {
+            return View();
+        }
+
+        public IActionResult SignIn()
         {
             return View();
         }
