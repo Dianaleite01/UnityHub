@@ -10,11 +10,11 @@ using UnityHub.Models;
 
 namespace UnityHub.Controllers
 {
-    public class VagasControllers : Controller
+    public class VagasController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public VagasControllers(ApplicationDbContext context)
+        public VagasController(ApplicationDbContext context)
         {
             _context = context;
         }

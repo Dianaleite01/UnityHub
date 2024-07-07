@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Meu Site</title>
+    <title>@ViewData["Title"] - UnityHub</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="~/css/site.css">
 </head>
@@ -19,25 +19,53 @@
                     <i class="fas fa-home"></i> Home
                 </a>
             </li>
-            <li>
-                <a asp-area="" asp-controller="Home" asp-action="About" class="nav-links">
-                    <i class="fas fa-info-circle"></i> Sobre
-                </a>
-            </li>
-            <li>
-                <a asp-area="" asp-controller="Home" asp-action="Contact" class="nav-links">
-                    <i class="fas fa-envelope"></i> Contacto
-                </a>
-            </li>
-            <li>
-                <a asp-area="" asp-controller="Home" asp-action="SignIn" class="nav-links">
-                    Registar
-                </a>
-            </li>
+            @if (User.Identity.IsAuthenticated && User.IsInRole("admin"))
+            {
+                <li>
+                    <a asp-area="" asp-controller="Vagas" asp-action="Index" class="nav-links">
+                        Vagas
+                    </a>
+                </li>
+                <li>
+                    <a asp-area="" asp-controller="Candidaturas" asp-action="Index" class="nav-links">
+                        Candidaturas
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li>
+                    <a asp-area="" asp-controller="Home" asp-action="About" class="nav-links">
+                        <i class="fas fa-info-circle"></i> Sobre
+                    </a>
+                </li>
+                <li>
+                    <a asp-area="" asp-controller="Home" asp-action="Contact" class="nav-links">
+                        <i class="fas fa-envelope"></i> Contacto
+                    </a>
+                </li>
+            }
+            @if (User.Identity.IsAuthenticated)
+            {
+                <li>
+                    <form asp-controller="Utilizadores" asp-action="Logout" method="post" id="logoutForm" style="display: none;"></form>
+                    <a href="javascript:document.getElementById('logoutForm').submit();" class="nav-links">
+                        Sair
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li>
+                    <a asp-area="" asp-controller="Utilizadores" asp-action="Register" class="nav-links">
+                        Registar
+                    </a>
+                </li>
+            }
         </ul>
     </div>
 
-    <div class="container">
+    <div class="container mt-5 pt-5">
         @RenderBody()
     </div>
 
