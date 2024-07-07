@@ -1,33 +1,38 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using UnityHub.Controllers;
 using UnityHub.Data;
+using UnityHub.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("UnityHubContextConnection") ?? throw new InvalidOperationException("Connection string 'UnityHubContextConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("UnityHubContextConnection")
+                      ?? throw new InvalidOperationException("Connection string 'UnityHubContextConnection' not found.");
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+// Configuração do DbContext com SQL Server
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString));
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();
+// Configuração dos serviços de identidade
+builder.Services.AddDefaultIdentity<Utilizadores>(options =>
+    options.SignIn.RequireConfirmedAccount = false)
+    .AddRoles<IdentityRole>()  // Adiciona suporte a roles
+    .AddEntityFrameworkStores<ApplicationDbContext>();
 
-// Add services to the container.
+// Adição dos controladores com views
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configuração do pipeline de requisição HTTP
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
+app.UseAuthentication(); // Adicionado para autenticação
 app.UseAuthorization();
 
 app.MapControllerRoute(
@@ -35,5 +40,4 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
-
 app.Run();

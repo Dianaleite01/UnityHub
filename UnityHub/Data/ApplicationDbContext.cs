@@ -10,16 +10,11 @@ using System.Text;
 
 namespace UnityHub.Data
 {
-    public class ApplicationUser : IdentityUser
-    {
-        [Required]
-        public string NomeUtilizador { get; set; }
-    }
 
     /// <summary>
     /// Esta classe representa a BD do nosso projeto
     /// </summary>
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<Utilizadores>
     {
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -41,8 +36,8 @@ namespace UnityHub.Data
             //a hasher to hash the password before seeding the user to the db
             var hasher = new PasswordHasher<IdentityUser>();
 
-            modelBuilder.Entity<ApplicationUser>().HasData(
-            new ApplicationUser
+            modelBuilder.Entity<Utilizadores>().HasData(
+            new Utilizadores
             {
                 Id = "admin",
                 UserName = "admin@UnityHub.pt",     // <-----------
@@ -51,7 +46,12 @@ namespace UnityHub.Data
                 NormalizedEmail = "ADMIN@UnityHub.PT",
                 EmailConfirmed = true,
                 PasswordHash = hasher.HashPassword(null, "Pa$$w0rd"),     // <-----------
-                NomeUtilizador = "Administrador"
+                Nome = "Administrador",
+                Telemovel = "912345678",
+                DataNascimento = new DateOnly(1980, 1, 1),
+                Cidade = "CidadeAdmin",
+                Pais = "PaisAdmin"
+
             });
 
             //adicionar o role aqui do admin
@@ -59,10 +59,15 @@ namespace UnityHub.Data
             modelBuilder.Entity<IdentityUserRole<string>>().HasData(
                 new IdentityUserRole<string> { RoleId = "admin", UserId = "admin" });
 
+            modelBuilder.Entity<Candidaturas>()
+                .HasOne(c => c.Utilizador)
+                .WithMany(u => u.Candidaturas)
+                .HasForeignKey(c => c.UtilizadorFK);
+
             modelBuilder.Entity<Vagas>()
                 .HasMany(c => c.Categorias)
                 .WithMany(v => v.VagasCategorias)
-                .UsingEntity(j => j.ToTable("VagaCategoria")); // Nome da tabela de associação opcional
+                .UsingEntity(j => j.ToTable("VagaCategoria"));
 
         }
 

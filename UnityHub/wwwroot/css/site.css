@@ -3,6 +3,45 @@ body {
     background-color: #f0f0f0;
 }
 
+.form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 120px); /* Garante que o formulário esteja centralizado verticalmente */
+    padding: 20px;
+}
+
+.form-box {
+    background: #fff; /* Cor de fundo branca */
+    padding: 20px; /* Espaçamento interno */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Adiciona uma sombra sutil */
+    border-radius: 8px; /* Arredonda os cantos da caixa */
+    max-width: 400px; /* Largura máxima da caixa */
+    width: 100%; /* Faz a caixa ocupar 100% da largura do contêiner */
+}
+
+    .form-box h2 {
+        margin-bottom: 20px; /* Espaçamento inferior do título */
+        font-size: 1.5rem; /* Tamanho da fonte do título */
+    }
+
+.form-group {
+    margin-bottom: 15px; /* Espaçamento inferior entre os campos */
+}
+
+.form-control {
+    padding: 10px; /* Ajusta o padding interno dos campos de entrada */
+    font-size: 1rem; /* Tamanho da fonte dos campos de entrada */
+}
+
+button {
+    padding: 10px 20px; /* Ajusta o padding dos botões */
+    font-size: 1rem; /* Tamanho da fonte dos botões */
+    font-weight: 600; /* Peso da fonte dos botões */
+    border-radius: 4px; /* Arredonda os cantos dos botões */
+}
+
+
 .NavbarItems {
     display: flex;
     justify-content: space-between;

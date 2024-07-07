@@ -1,14 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace UnityHub.Models
 {
-    public class Utilizadores
+    public class Utilizadores : IdentityUser
     {
-        /// <summary>
-        /// Chave Primária (PK)
-        /// </summary>
-        [Key]
-        public int Id { get; set; }
 
         /// <summary>
         /// Nome do Utilizador
@@ -29,9 +25,6 @@ namespace UnityHub.Models
              ErrorMessage = "o {0} só aceita 9 digitos")]
         public string Telemovel { get; set; }
 
-        [Required(ErrorMessage = "O {0} é de preenchimento obrigatório.")]
-        [EmailAddress]
-        public string Email { get; set; }
 
         /// <summary>
         /// Data de Nascimento do utilizador
@@ -55,6 +48,7 @@ namespace UnityHub.Models
         [StringLength(50)]
         [Required(ErrorMessage = "O {0} é de preenchimento obrigatório.")]
         public string Pais { get; set; }
+
 
         // Relacionamento N-M com Candidaturas (um Utilizador pode ter várias candidaturas, mas uma candidatura está associada a apenas um utilizador)
         public ICollection<Candidaturas> Candidaturas { get; set; }

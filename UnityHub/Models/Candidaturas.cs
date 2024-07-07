@@ -28,7 +28,7 @@ namespace UnityHub.Models
         /// Chave Estrangeira para o Utilizador
         /// </summary>        
         [ForeignKey("Utilizador")]
-        public int UtilizadorFK { get; set; }
+        public string UtilizadorFK { get; set; }
         public Utilizadores Utilizador { get; set; }
     }
 }

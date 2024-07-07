@@ -18,6 +18,7 @@ namespace UnityHub.Models
         public string Nome { get; set; }
 
         [Required(ErrorMessage = "O campo {0} é obrigatório.")]
+        [Display(Name = "Período")]
         public string PeriodoVoluntariado { get; set; }
 
         /// <summary>
