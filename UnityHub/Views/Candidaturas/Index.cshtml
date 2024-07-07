@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<UnityHub.Models.Candidaturas>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Candidaturas";
 }
 
 <h1>Candidaturas</h1>
@@ -9,40 +9,48 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
+<table class="table" id="candidaturasTable">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Estado)
+                Estado
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Vaga.Descricao) 
+                Vaga
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Utilizador.Cidade) 
+                Utilizador
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Estado)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Vaga.Descricao) 
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Utilizador.Cidade) 
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
-        }
     </tbody>
 </table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '@Url.Action("GetCandidaturas", "Candidaturas")',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    var tbody = $('#candidaturasTable tbody');
+                    tbody.empty();
+                    $.each(data, function (index, item) {
+                        var row = $('<tr>');
+                        row.append($('<td>').text(item.Estado));
+                        row.append($('<td>').text(item.Vaga.Descricao));
+                        row.append($('<td>').text(item.Utilizador.Nome));
+                        row.append($('<td>').html('<a href="/Candidaturas/Edit/' + item.Id + '">Edit</a> | <a href="/Candidaturas/Details/' + item.Id + '">Details</a> | <a href="/Candidaturas/Delete/' + item.Id + '" onclick="return confirm(\'Are you sure you want to delete this item?\');">Delete</a>'));
+                        tbody.append(row);
+                    });
+                },
+                error: function () {
+                    alert('Failed to retrieve data.');
+                }
+            });
+        });
+    </script>
+}
