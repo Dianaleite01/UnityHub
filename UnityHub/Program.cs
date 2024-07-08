@@ -17,8 +17,21 @@ builder.Services.AddDefaultIdentity<Utilizadores>(options =>
     .AddRoles<IdentityRole>()  // Adiciona suporte a roles
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+// Configuração do CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+});
+
 // Adição dos controladores com views
 builder.Services.AddControllersWithViews();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -29,6 +42,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseCors("AllowAllOrigins");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
@@ -40,4 +54,5 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
+app.MapControllers();
 app.Run();
