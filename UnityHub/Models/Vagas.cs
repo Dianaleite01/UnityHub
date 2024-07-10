@@ -1,9 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using UnityHub.Migrations;
 
 namespace UnityHub.Models
 {
     public class Vagas
     {
+        public Vagas()
+        {
+            VagasCategorias = new HashSet<VagaCategoria>();
+        }
         /// <summary>
         /// Chave Primária (PK)
         /// </summary>
@@ -39,6 +44,6 @@ namespace UnityHub.Models
         public ICollection<Candidaturas> ListaCandidaturas { get; set; }
 
         // Relacionamento M-N com Categoria
-        public ICollection<Categorias> Categorias { get; set; }
+        public ICollection<VagaCategoria> VagasCategorias { get; set; }
     }
 }
