@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UnityHub.Data;
 
@@ -11,9 +12,11 @@ using UnityHub.Data;
 namespace UnityHub.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240709135352_VagaCategoria")]
+    partial class VagaCategoria
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -319,7 +322,7 @@ namespace UnityHub.Migrations
                             Id = "admin",
                             AccessFailedCount = 0,
                             Cidade = "CidadeAdmin",
-                            ConcurrencyStamp = "5d9b217b-2b50-49e0-8392-afb4b671be8d",
+                            ConcurrencyStamp = "fcca16a5-e91b-4b06-b1bf-88702f69dfed",
                             DataNascimento = new DateOnly(1980, 1, 1),
                             Email = "admin@UnityHub.pt",
                             EmailConfirmed = true,
@@ -328,9 +331,9 @@ namespace UnityHub.Migrations
                             NormalizedEmail = "ADMIN@UnityHub.PT",
                             NormalizedUserName = "ADMIN@UNITYHUB.PT",
                             Pais = "PaisAdmin",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMxHTcsd4ALiev85JYmaf7HqoP+7dFgI2lTNiRytXHihB/vBaDFaDBjujxEf9VOycw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJGz9OWuLpgQ8DkECQlaTfgnPHLHkFmEbysJ6hyaJJVkd1ISHWrys3v8RoB4grn5Mg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "95abf1ec-2e15-4841-9052-62a6b10e388d",
+                            SecurityStamp = "84a852a8-3f36-43e3-9a11-5c3af630292a",
                             Telemovel = "912345678",
                             TwoFactorEnabled = false,
                             UserName = "admin@UnityHub.pt"

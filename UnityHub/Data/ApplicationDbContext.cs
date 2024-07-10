@@ -64,10 +64,18 @@ namespace UnityHub.Data
                 .WithMany(u => u.Candidaturas)
                 .HasForeignKey(c => c.UtilizadorFK);
 
-            modelBuilder.Entity<Vagas>()
-                .HasMany(c => c.Categorias)
+            modelBuilder.Entity<VagaCategoria>()
+                .HasKey(vc => new { vc.VagaId, vc.CategoriaId });
+
+            modelBuilder.Entity<VagaCategoria>()
+                .HasOne(vc => vc.Vaga)
                 .WithMany(v => v.VagasCategorias)
-                .UsingEntity(j => j.ToTable("VagaCategoria"));
+                .HasForeignKey(vc => vc.VagaId);
+
+            modelBuilder.Entity<VagaCategoria>()
+                .HasOne(vc => vc.Categoria)
+                .WithMany(c => c.VagasCategorias)
+                .HasForeignKey(vc => vc.CategoriaId);
 
         }
 
@@ -79,5 +87,6 @@ namespace UnityHub.Data
         public DbSet<Vagas> Vagas { get; set; }
         public DbSet<Candidaturas> Candidaturas { get; set; }
         public DbSet<Categorias> Categorias { get; set; }
+        public DbSet<VagaCategoria> VagaCategoria { get; set; }
     }
 }
