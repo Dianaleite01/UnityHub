@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -9,6 +10,7 @@ using UnityHub.ViewModels;
 
 namespace UnityHub.Controllers
 {
+    [Authorize(Roles = "admin")]
     public class UtilizadoresController : Controller
     {
         private readonly ApplicationDbContext _context;
