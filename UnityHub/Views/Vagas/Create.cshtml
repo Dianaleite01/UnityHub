@@ -1,37 +1,65 @@
 ﻿@model UnityHub.Models.Vagas
-
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Vaga";
 }
 
-<h1>Create</h1>
+<h1>Create Vaga</h1>
 
-<h4>Voluntariados</h4>
+<h4>Vaga</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
             <div class="form-group">
                 <label asp-for="Nome" class="control-label"></label>
                 <input asp-for="Nome" class="form-control" />
                 <span asp-validation-for="Nome" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="PeriodoVoluntariado" class="control-label"></label>
                 <input asp-for="PeriodoVoluntariado" class="form-control" />
                 <span asp-validation-for="PeriodoVoluntariado" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="Local" class="control-label"></label>
                 <input asp-for="Local" class="form-control" />
                 <span asp-validation-for="Local" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="Descricao" class="control-label"></label>
-                <input asp-for="Descricao" class="form-control" />
+                <textarea asp-for="Descricao" class="form-control"></textarea>
                 <span asp-validation-for="Descricao" class="text-danger"></span>
             </div>
+
+            <div class="form-group">
+                <label asp-for="Foto" class="control-label"></label>
+                <input asp-for="Foto" type="file" class="form-control" />
+                <span asp-validation-for="Foto" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="CategoriaIds" class="control-label">Categorias</label>
+                <div class="dropdown-multiselect">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        Selecionar Categorias
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        @foreach (var categoria in (List<SelectListItem>)ViewBag.Categorias)
+                        {
+                            <li>
+                                <input type="checkbox" name="CategoriaIds" value="@categoria.Value" /> @categoria.Text
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
@@ -39,10 +67,65 @@
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            $('.dropdown-toggle').click(function () {
+                $(this).next('.dropdown-menu').toggle();
+            });
+
+            $(document).click(function (e) {
+                if (!$(e.target).closest('.dropdown-multiselect').length) {
+                    $('.dropdown-menu').hide();
+                }
+            });
+        });
+    </script>
+    <style>
+        .dropdown-multiselect {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-toggle {
+            width: 100%;
+            text-align: left;
+            background-color: #007bff;
+            color: white;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            padding: 10px;
+        }
+
+            .dropdown-toggle:hover,
+            .dropdown-toggle:focus {
+                background-color: #0056b3;
+                color: white;
+            }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            background-color: white;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            padding: 12px 16px;
+            z-index: 1;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+            .dropdown-menu li {
+                list-style: none;
+                margin-bottom: 10px;
+            }
+
+                .dropdown-menu li input[type="checkbox"] {
+                    margin-right: 10px;
+                }
+
+    </style>
 }

@@ -31,6 +31,11 @@
                         Candidaturas
                     </a>
                 </li>
+                <li>
+                    <a asp-area="" asp-controller="Categorias" asp-action="Index" class="nav-links">
+                        Categorias
+                    </a>
+                </li>
             }
             else
             {
@@ -72,5 +77,6 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.5.4/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

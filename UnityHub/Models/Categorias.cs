@@ -5,6 +5,11 @@ namespace UnityHub.Models
 {
     public class Categorias
     {
+        public Categorias()
+        {
+            VagasCategorias = new HashSet<VagaCategoria>();
+        }
+
         /// <summary>
         /// Chave Primária (PK)
         /// </summary>
@@ -19,6 +24,6 @@ namespace UnityHub.Models
         public string Nome { get; set; }
 
         // Relacionamento M-N com Vagas
-        public ICollection<Vagas> VagasCategorias { get; set; }
+        public ICollection<VagaCategoria> VagasCategorias { get; set; }
     }
 }

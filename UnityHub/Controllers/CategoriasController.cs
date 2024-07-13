@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UnityHub.Data;
 using UnityHub.Models;
+using System.Threading.Tasks;
 
 namespace UnityHub.Controllers
 {
@@ -49,21 +45,37 @@ namespace UnityHub.Controllers
             return View();
         }
 
-        // POST: Categorias/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nome")] Categorias categorias)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(categorias);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    _context.Add(categorias);
+                    await _context.SaveChangesAsync();
+                    Console.WriteLine("Categoria criada com sucesso: " + categorias.Nome);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Erro ao salvar no banco de dados: " + ex.Message);
+                    Console.WriteLine(ex.StackTrace);
+                }
             }
+            else
+            {
+                foreach (var state in ModelState)
+                {
+                    Console.WriteLine($"{state.Key}: {string.Join(", ", state.Value.Errors.Select(e => e.ErrorMessage))}");
+                }
+            }
+            Console.WriteLine("Falha na criação da categoria: " + categorias.Nome);
             return View(categorias);
         }
+
+
 
         // GET: Categorias/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -82,8 +94,6 @@ namespace UnityHub.Controllers
         }
 
         // POST: Categorias/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Nome")] Categorias categorias)

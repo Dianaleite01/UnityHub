@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UnityHub.Data;
 
@@ -11,9 +12,11 @@ using UnityHub.Data;
 namespace UnityHub.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240709142657_VagaCategoriaNew")]
+    partial class VagaCategoriaNew
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -319,7 +322,7 @@ namespace UnityHub.Migrations
                             Id = "admin",
                             AccessFailedCount = 0,
                             Cidade = "CidadeAdmin",
-                            ConcurrencyStamp = "1b132e24-72e3-4c31-bd19-0a8a0eb7e64f",
+                            ConcurrencyStamp = "ace91c23-50f7-4210-a10b-2477299a12f1",
                             DataNascimento = new DateOnly(1980, 1, 1),
                             Email = "admin@UnityHub.pt",
                             EmailConfirmed = true,
@@ -328,9 +331,9 @@ namespace UnityHub.Migrations
                             NormalizedEmail = "ADMIN@UnityHub.PT",
                             NormalizedUserName = "ADMIN@UNITYHUB.PT",
                             Pais = "PaisAdmin",
-                            PasswordHash = "AQAAAAIAAYagAAAAECXqi688EexC7p8PdzotpTaxKS2uSpbB94Tfsry9ZPohRJuCKr84tZX5ebPXURdeUg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEkkMul7o+e4N04IBknB/GrSViLBe5xmlu7qU0JyHRob5O2Iwcb2OXKCOGaiSif4zg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "7063dc8a-2a11-4c2c-b5b8-06f027ead4a7",
+                            SecurityStamp = "93e7e475-8248-48ae-8017-d79455e83d52",
                             Telemovel = "912345678",
                             TwoFactorEnabled = false,
                             UserName = "admin@UnityHub.pt"
@@ -361,10 +364,6 @@ namespace UnityHub.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Descricao")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Fotografia")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
