@@ -49,7 +49,6 @@ namespace UnityHub.Models
         [Required(ErrorMessage = "O {0} é de preenchimento obrigatório.")]
         public string Pais { get; set; }
 
-
         // Relacionamento N-M com Candidaturas (um Utilizador pode ter várias candidaturas, mas uma candidatura está associada a apenas um utilizador)
         public ICollection<Candidaturas> Candidaturas { get; set; }
 

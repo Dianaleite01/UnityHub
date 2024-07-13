@@ -22,6 +22,13 @@ builder.Services.AddDefaultIdentity<Utilizadores>(options =>
 .AddRoles<IdentityRole>() // Adiciona suporte a roles
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+// Configuração de cookies de autenticação
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Utilizadores/Login"; // Rota para a página de login
+    options.AccessDeniedPath = "/Utilizadores/AccessDenied"; // Rota para a página de acesso negado
+});
+
 // Configuração do CORS
 builder.Services.AddCors(options =>
 {
@@ -39,8 +46,7 @@ builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.MaxDepth = 64; // Define a profundidade máxima desejada
-        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
-
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
     });
 
 var app = builder.Build();

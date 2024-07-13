@@ -6,6 +6,7 @@
     <title>@ViewData["Title"] - UnityHub</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="~/css/site.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <div class="NavbarItems">
@@ -52,6 +53,14 @@
             }
             @if (User.Identity.IsAuthenticated)
             {
+                if (!User.IsInRole("admin")) // Apenas para usuários que não são administradores
+                {
+                    <li>
+                        <a asp-area="" asp-controller="Utilizadores" asp-action="Perfil" class="nav-links">
+                            Perfil
+                        </a>
+                    </li>
+                }
                 <li>
                     <form asp-controller="Utilizadores" asp-action="Logout" method="post" id="logoutForm" style="display: none;"></form>
                     <a href="javascript:document.getElementById('logoutForm').submit();" class="nav-links">

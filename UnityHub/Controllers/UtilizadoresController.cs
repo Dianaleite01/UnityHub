@@ -10,7 +10,7 @@ using UnityHub.ViewModels;
 
 namespace UnityHub.Controllers
 {
-
+    [Authorize]
     public class UtilizadoresController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -24,13 +24,14 @@ namespace UnityHub.Controllers
             _signInManager = signInManager;
         }
 
-        // GET: Utilizadores
+        // Método GET para exibir a lista de utilizadores
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Utilizadores.ToListAsync());
         }
 
-        // GET: Utilizadores/Details/5
+        // Método GET para exibir detalhes de um utilizador específico (apenas para administradores)
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> Details(string id)
         {
@@ -49,15 +50,17 @@ namespace UnityHub.Controllers
             return View(utilizadores);
         }
 
-        // GET: Utilizadores/Create
+        // Método GET para exibir o formulário de criação de um novo utilizador
+        [AllowAnonymous]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Utilizadores/Create
+        // Método POST para criar um novo utilizador
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [AllowAnonymous]
         public async Task<IActionResult> Create([Bind("Id,Nome,Telemovel,Email,DataNascimento,Cidade,Pais")] Utilizadores utilizadores)
         {
             if (ModelState.IsValid)
@@ -69,7 +72,7 @@ namespace UnityHub.Controllers
             return View(utilizadores);
         }
 
-        // GET: Utilizadores/Edit/5
+        // Método GET para exibir o formulário de edição de um utilizador específico (apenas para administradores)
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(string id)
         {
@@ -83,10 +86,17 @@ namespace UnityHub.Controllers
             {
                 return NotFound();
             }
+
+            // Verifica se o usuário é o administrador e impede a edição
+            if (utilizadores.UserName == "admin@UnityHub.pt")
+            {
+                return Forbid();
+            }
+
             return View(utilizadores);
         }
 
-        // POST: Utilizadores/Edit/5
+        // Método POST para editar um utilizador específico (apenas para administradores)
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "admin")]
@@ -95,6 +105,12 @@ namespace UnityHub.Controllers
             if (id != utilizadores.Id)
             {
                 return NotFound();
+            }
+
+            // Verifica se o usuário é o administrador e impede a edição
+            if (utilizadores.UserName == "admin@UnityHub.pt")
+            {
+                return Forbid();
             }
 
             if (ModelState.IsValid)
@@ -120,7 +136,7 @@ namespace UnityHub.Controllers
             return View(utilizadores);
         }
 
-        // GET: Utilizadores/Delete/5
+        // Método GET para exibir o formulário de eliminação de um utilizador específico (apenas para administradores)
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(string id)
         {
@@ -136,16 +152,29 @@ namespace UnityHub.Controllers
                 return NotFound();
             }
 
+            // Verifica se o usuário é o administrador e impede a eliminação
+            if (utilizadores.UserName == "admin@UnityHub.pt")
+            {
+                return Forbid();
+            }
+
             return View(utilizadores);
         }
 
-        // POST: Utilizadores/Delete/5
+        // Método POST para confirmar a eliminação de um utilizador específico (apenas para administradores)
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var utilizadores = await _context.Utilizadores.FindAsync(id);
+
+            // Verifica se o usuário é o administrador e impede a eliminação
+            if (utilizadores.UserName == "admin@UnityHub.pt")
+            {
+                return Forbid();
+            }
+
             if (utilizadores != null)
             {
                 _context.Utilizadores.Remove(utilizadores);
@@ -155,21 +184,24 @@ namespace UnityHub.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // Método para verificar se um utilizador existe
         private bool UtilizadoresExists(string id)
         {
             return _context.Utilizadores.Any(e => e.Id == id);
         }
 
-        // GET: Utilizadores/Register
+        // Método GET para exibir o formulário de registo de um novo utilizador
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Register()
         {
             return View();
         }
 
-        // POST: Utilizadores/Register
+        // Método POST para registar um novo utilizador
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [AllowAnonymous]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
@@ -198,16 +230,18 @@ namespace UnityHub.Controllers
             return View(model);
         }
 
-        // GET: Utilizadores/Login
+        // Método GET para exibir o formulário de login
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Login()
         {
             return View();
         }
 
-        // POST: Utilizadores/Login
+        // Método POST para efetuar o login
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
@@ -222,31 +256,90 @@ namespace UnityHub.Controllers
                     }
                     else if (result.IsLockedOut)
                     {
-                        ModelState.AddModelError(string.Empty, "User account locked out.");
+                        ModelState.AddModelError(string.Empty, "Conta de utilizador bloqueada.");
                     }
                     else if (result.IsNotAllowed)
                     {
-                        ModelState.AddModelError(string.Empty, "You are not allowed to login.");
+                        ModelState.AddModelError(string.Empty, "Não tem permissão para fazer login.");
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                        ModelState.AddModelError(string.Empty, "Tentativa de login inválida.");
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "User not found.");
+                    ModelState.AddModelError(string.Empty, "Utilizador não encontrado.");
                 }
             }
             return View(model);
         }
 
-        // POST: Utilizadores/Logout
+        // Método POST para efetuar o logout
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
+        }
+
+        // Método GET para exibir o formulário de perfil do utilizador
+        [Authorize]
+        public async Task<IActionResult> Perfil()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var model = new ProfileViewModel
+            {
+                Nome = user.Nome,
+                Telemovel = user.Telemovel,
+                DataNascimento = user.DataNascimento,
+                Cidade = user.Cidade,
+                Pais = user.Pais,
+                Email = user.Email
+            };
+
+            return View(model);
+        }
+
+        // Método POST para atualizar o perfil do utilizador
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> Perfil(ProfileViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.Nome = model.Nome;
+            user.Telemovel = model.Telemovel;
+            user.DataNascimento = model.DataNascimento;
+            user.Cidade = model.Cidade;
+            user.Pais = model.Pais;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                return View(model);
+            }
+
             return RedirectToAction("Index", "Home");
         }
     }

@@ -1,0 +1,26 @@
+﻿@model UnityHub.Models.Vagas
+
+@{
+    ViewData["Title"] = "Detalhes da Vaga";
+}
+
+<h2>Detalhes da Vaga</h2>
+
+<div class="card mb-4 shadow-sm">
+    <img src="@Url.Content("~/images/" + Model.Fotografia)" class="card-img-top" alt="Imagem da Vaga">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Nome</h5>
+        <p class="card-text">@Model.Descricao</p>
+        <p><strong>Local:</strong> @Model.Local</p>
+        <p><strong>Período de Voluntariado:</strong> @Model.PeriodoVoluntariado</p>
+        <p><strong>Categorias:</strong> @string.Join(", ", Model.VagasCategorias.Select(vc => vc.Categoria.Nome))</p>
+        <form asp-action="Create" asp-controller="Candidaturas">
+            <input type="hidden" name="VagaFK" value="@Model.Id" />
+            <input type="hidden" name="Estado" value="Pendente" />
+            <input type="hidden" name="UtilizadorFK" value="@User.Identity.Name" /> 
+            <button type="submit" class="btn btn-success">Candidatar-se</button>
+        </form>
+    </div>
+</div>
+
+<a asp-action="Index" class="btn btn-secondary">Voltar para a lista</a>

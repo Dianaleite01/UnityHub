@@ -49,14 +49,12 @@ namespace UnityHub.Controllers
         // GET: Candidaturas/Create
         public IActionResult Create()
         {
-            ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Cidade");
-            ViewData["VagaFK"] = new SelectList(_context.Vagas, "Id", "Descricao");
+            ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Nome");
+            ViewData["VagaFK"] = new SelectList(_context.Vagas, "Id", "Nome");
             return View();
         }
 
         // POST: Candidaturas/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Estado,VagaFK,UtilizadorFK")] Candidaturas candidaturas)
@@ -65,10 +63,10 @@ namespace UnityHub.Controllers
             {
                 _context.Add(candidaturas);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Home");
             }
-            ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Cidade", candidaturas.UtilizadorFK);
-            ViewData["VagaFK"] = new SelectList(_context.Vagas, "Id", "Descricao", candidaturas.VagaFK);
+            ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Nome", candidaturas.UtilizadorFK);
+            ViewData["VagaFK"] = new SelectList(_context.Vagas, "Id", "Nome", candidaturas.VagaFK);
             return View(candidaturas);
         }
 
@@ -85,17 +83,15 @@ namespace UnityHub.Controllers
             {
                 return NotFound();
             }
-            ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Cidade", candidaturas.UtilizadorFK);
-            ViewData["VagaFK"] = new SelectList(_context.Vagas, "Id", "Descricao", candidaturas.VagaFK);
+            ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Nome", candidaturas.UtilizadorFK);
+            ViewData["VagaFK"] = new SelectList(_context.Vagas, "Id", "Nome", candidaturas.VagaFK);
             return View(candidaturas);
         }
 
         // POST: Candidaturas/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Estado,VoluntariadoFK,UtilizadorFK")] Candidaturas candidaturas)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Estado,VagaFK,UtilizadorFK")] Candidaturas candidaturas)
         {
             if (id != candidaturas.Id)
             {
@@ -122,8 +118,8 @@ namespace UnityHub.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Cidade", candidaturas.UtilizadorFK);
-            ViewData["VagaFK"] = new SelectList(_context.Vagas, "Id", "Descricao", candidaturas.VagaFK);
+            ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Nome", candidaturas.UtilizadorFK);
+            ViewData["VagaFK"] = new SelectList(_context.Vagas, "Id", "Nome", candidaturas.VagaFK);
             return View(candidaturas);
         }
 
