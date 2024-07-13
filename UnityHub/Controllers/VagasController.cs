@@ -4,11 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using UnityHub.Data;
 using UnityHub.Models;
 using Microsoft.AspNetCore.Authorization;
-
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace UnityHub.Controllers
 {
-    //apenas os utilizadores com estes roles podem aceder a este controller
     [Authorize(Roles = "admin")]
     public class VagasController : Controller
     {
@@ -24,7 +25,6 @@ namespace UnityHub.Controllers
         // GET: Vagas
         public async Task<IActionResult> Index()
         {
-            //carrega todas as vagas do banco de dados, incluindo as categorias 
             var applicationDbContext = _context.Vagas.Include(v => v.VagasCategorias);
             return View(await applicationDbContext.ToListAsync());
         }
@@ -37,7 +37,6 @@ namespace UnityHub.Controllers
                 return NotFound();
             }
 
-            // Carrega os detalhes de uma vaga específica, incluindo as categorias que lhe estão associadas
             var vagas = await _context.Vagas
                 .Include(v => v.VagasCategorias)
                 .ThenInclude(vc => vc.Categoria)
@@ -53,48 +52,61 @@ namespace UnityHub.Controllers
         // GET: Vagas/Create
         public IActionResult Create()
         {
-            //preparar a view de criação de vaga, incluindo a lista de categorias disponiveis
-            ViewData["CategoriaIds"] = new SelectList(_context.Categorias, "Id", "Nome");
+            ViewBag.Categorias = _context.Categorias.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.Nome
+            }).ToList();
             return View();
         }
 
         // POST: Vagas/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,PeriodoVoluntariado,Local,Descricao,Foto,CategoriaIds")] Vagas vagas)
+        public async Task<IActionResult> Create([Bind("Id,Nome,PeriodoVoluntariado,Local,Descricao,CategoriaIds")] Vagas vagas, IFormFile foto)
         {
+            ModelState.Remove("Foto");
+            ModelState.Remove("Fotografia");
+
             if (ModelState.IsValid)
             {
-                //lidar com a fotografia
-                if (vagas.Foto != null)
+                if (foto != null && foto.Length > 0)
                 {
-                    string fileName = Path.GetFileNameWithoutExtension(vagas.Foto.FileName);
-                    string extension = Path.GetExtension(vagas.Foto.FileName);
-                    string webRootPath = _hostEnvironment.WebRootPath;
-                    string uniqueFileName = $"{fileName}_{DateTime.Now.ToString("yymmssfff")}{extension}";
-                    string filePath = Path.Combine(webRootPath, "images", uniqueFileName);
+                    string fileName = Guid.NewGuid().ToString() + "_" + foto.FileName;
+                    string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", fileName);
+
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
-                        await vagas.Foto.CopyToAsync(fileStream);
+                        await foto.CopyToAsync(fileStream);
                     }
-                    vagas.Fotografia = uniqueFileName;
+
+                    vagas.Fotografia = fileName;
                 }
-                //associa as categorias selecionadas à nova vaga
-                vagas.VagasCategorias = new List<VagaCategoria>();
-                foreach (var categoriaId in vagas.CategoriaIds)
+                else
                 {
-                    var categoria = await _context.Categorias.FindAsync(categoriaId);
-                    if (categoria != null)
+                    ModelState.AddModelError("Foto", "O campo Fotografia é obrigatório.");
+                    ViewBag.Categorias = _context.Categorias.Select(c => new SelectListItem
                     {
-                        vagas.VagasCategorias.Add(new VagaCategoria { Vaga = vagas, CategoriaId = categoriaId });
-                    }
+                        Value = c.Id.ToString(),
+                        Text = c.Nome
+                    }).ToList();
+                    return View(vagas);
                 }
 
-                _context.Add(vagas); //adiciona a nova vaga ao contexto
-                await _context.SaveChangesAsync(); //Salva as alterações na bd
-                return RedirectToAction(nameof(Index)); //redireciona para a pagina da lista de vagas
+                vagas.VagasCategorias = vagas.CategoriaIds
+                    .Select(id => new VagaCategoria { CategoriaId = id, Vaga = vagas })
+                    .ToList();
+
+                _context.Add(vagas);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoriaIds"] = new SelectList(_context.Categorias, "Id", "Nome", vagas.CategoriaIds);
+
+            ViewBag.Categorias = _context.Categorias.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.Nome
+            }).ToList();
             return View(vagas);
         }
 
@@ -106,7 +118,6 @@ namespace UnityHub.Controllers
                 return NotFound();
             }
 
-            //carrega a vaga existente para a editar, incluindo as categorias
             var vagas = await _context.Vagas.Include(v => v.VagasCategorias).FirstOrDefaultAsync(m => m.Id == id);
             if (vagas == null)
             {
@@ -114,19 +125,26 @@ namespace UnityHub.Controllers
             }
 
             vagas.CategoriaIds = vagas.VagasCategorias.Select(vc => vc.CategoriaId).ToList();
-            ViewData["CategoriaIds"] = new SelectList(_context.Categorias, "Id", "Nome", vagas.CategoriaIds);
+            ViewBag.Categorias = _context.Categorias.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.Nome
+            }).ToList();
             return View(vagas);
         }
 
         // POST: Vagas/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,PeriodoVoluntariado,Local,Descricao,Foto,CategoriaIds")] Vagas vagas)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,PeriodoVoluntariado,Local,Descricao,CategoriaIds")] Vagas vagas, IFormFile foto)
         {
             if (id != vagas.Id)
             {
                 return NotFound();
             }
+
+            ModelState.Remove("Foto");
+            ModelState.Remove("Fotografia");
 
             if (ModelState.IsValid)
             {
@@ -140,37 +158,28 @@ namespace UnityHub.Controllers
                         return NotFound();
                     }
 
-                    if (vagas.Foto != null)
+                    if (foto != null && foto.Length > 0)
                     {
-                        string fileName = Path.GetFileNameWithoutExtension(vagas.Foto.FileName);
-                        string extension = Path.GetExtension(vagas.Foto.FileName);
-                        string webRootPath = _hostEnvironment.WebRootPath;
-                        string uniqueFileName = $"{fileName}_{DateTime.Now.ToString("yymmssfff")}{extension}";
-                        string filePath = Path.Combine(webRootPath, "images", uniqueFileName);
+                        string fileName = Guid.NewGuid().ToString() + "_" + foto.FileName;
+                        string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", fileName);
 
                         using (var fileStream = new FileStream(filePath, FileMode.Create))
                         {
-                            await vagas.Foto.CopyToAsync(fileStream);
+                            await foto.CopyToAsync(fileStream);
                         }
 
-                        existingVagas.Fotografia = uniqueFileName;
+                        existingVagas.Fotografia = fileName;
                     }
 
-                    //atualiza os dados com os novos valores
                     existingVagas.Nome = vagas.Nome;
                     existingVagas.PeriodoVoluntariado = vagas.PeriodoVoluntariado;
                     existingVagas.Local = vagas.Local;
                     existingVagas.Descricao = vagas.Descricao;
 
-                    //limpa e recra a associação com as categorias selecionadas
                     existingVagas.VagasCategorias.Clear();
                     foreach (var categoriaId in vagas.CategoriaIds)
                     {
-                        var categoria = await _context.Categorias.FindAsync(categoriaId);
-                        if (categoria != null)
-                        {
-                            existingVagas.VagasCategorias.Add(new VagaCategoria { VagaId = id, CategoriaId = categoriaId });
-                        }
+                        existingVagas.VagasCategorias.Add(new VagaCategoria { VagaId = id, CategoriaId = categoriaId });
                     }
 
                     _context.Update(existingVagas);
@@ -189,7 +198,12 @@ namespace UnityHub.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoriaIds"] = new SelectList(_context.Categorias, "Id", "Nome", vagas.CategoriaIds);
+
+            ViewBag.Categorias = _context.Categorias.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.Nome
+            }).ToList();
             return View(vagas);
         }
 
