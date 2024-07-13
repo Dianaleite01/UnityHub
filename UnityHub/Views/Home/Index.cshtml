@@ -1,5 +1,26 @@
-﻿@{
-    ViewData["Title"] = "Home";
+﻿@model IEnumerable<UnityHub.Models.Vagas>
+
+@{
+    ViewData["Title"] = "Home Page";
 }
 
+<h2>Vagas Disponíveis</h2>
 
+<div class="row">
+    @foreach (var vaga in Model)
+    {
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <img src="@Url.Content("~/images/" + vaga.Fotografia)" class="card-img-top" alt="Imagem da Vaga">
+                <div class="card-body">
+                    <h5 class="card-title">@vaga.Nome</h5>
+                    <p class="card-text">@vaga.Descricao</p>
+                    <p><strong>Local:</strong> @vaga.Local</p>
+                    <p><strong>Período de Voluntariado:</strong> @vaga.PeriodoVoluntariado</p>
+                    <p><strong>Categorias:</strong> @string.Join(", ", vaga.VagasCategorias.Select(vc => vc.Categoria.Nome))</p>
+                    <a href="@Url.Action("Details", "Home", new { id = vaga.Id })" class="btn btn-primary">Ver Detalhes</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
