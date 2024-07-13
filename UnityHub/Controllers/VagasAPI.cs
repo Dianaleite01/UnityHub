@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using UnityHub.Data;
 using UnityHub.Models;
-using System.IO;
 
 namespace UnityHub.Controllers
 {
@@ -17,26 +18,49 @@ namespace UnityHub.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _hostEnvironment;
+        private readonly ILogger<VagasAPI> _logger;
 
-        public VagasAPI(ApplicationDbContext context, IWebHostEnvironment hostEnvironment)
+        public VagasAPI(ApplicationDbContext context, IWebHostEnvironment hostEnvironment, ILogger<VagasAPI> logger)
         {
             _context = context;
             _hostEnvironment = hostEnvironment;
+            _logger = logger;
         }
 
-        // GET: api/Vagas
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Vagas>>> GetVagas()
+        public async Task<ActionResult<IEnumerable<VagaDTO>>> GetVagas()
         {
-            return await _context.Vagas
-                .Include(v => v.VagasCategorias)
-                .ThenInclude(vc => vc.Categoria)
-                .ToListAsync();
+            try
+            {
+                _logger.LogInformation("Fetching vagas from database.");
+                var vagas = await _context.Vagas
+                    .Include(v => v.VagasCategorias)
+                    .ThenInclude(vc => vc.Categoria)
+                    .ToListAsync();
+
+                var vagasDTO = vagas.Select(v => new VagaDTO
+                {
+                    Id = v.Id,
+                    Nome = v.Nome,
+                    PeriodoVoluntariado = v.PeriodoVoluntariado,
+                    Local = v.Local,
+                    Descricao = v.Descricao,
+                    Fotografia = v.Fotografia,
+                    Categorias = v.VagasCategorias.Select(vc => vc.CategoriaId).ToList() // Usando CategoriaId em vez de CategoriaDTO
+                }).ToList();
+
+                _logger.LogInformation("Returning {Count} vagas.", vagasDTO.Count);
+                return Ok(vagasDTO);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching vagas.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while fetching vagas.");
+            }
         }
 
-        // GET: api/Vagas/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Vagas>> GetVagas(int id)
+        public async Task<ActionResult<VagaDTO>> GetVagas(int id)
         {
             var vaga = await _context.Vagas
                 .Include(v => v.VagasCategorias)
@@ -48,12 +72,22 @@ namespace UnityHub.Controllers
                 return NotFound();
             }
 
-            return vaga;
+            var vagaDTO = new VagaDTO
+            {
+                Id = vaga.Id,
+                Nome = vaga.Nome,
+                PeriodoVoluntariado = vaga.PeriodoVoluntariado,
+                Local = vaga.Local,
+                Descricao = vaga.Descricao,
+                Fotografia = vaga.Fotografia,
+                Categorias = vaga.VagasCategorias.Select(vc => vc.CategoriaId).ToList() // Usando CategoriaId em vez de CategoriaDTO
+            };
+
+            return Ok(vagaDTO);
         }
 
-        // POST: api/Vagas
         [HttpPost]
-        public async Task<ActionResult<Vagas>> PostVagas([FromForm] Vagas vaga, [FromForm] IFormFile Fotografia)
+        public async Task<ActionResult<Vagas>> PostVagas([FromBody] VagaDTO vagaDTO)
         {
             if (!ModelState.IsValid)
             {
@@ -62,24 +96,16 @@ namespace UnityHub.Controllers
 
             try
             {
-                if (Fotografia != null && Fotografia.Length > 0)
+                var vaga = new Vagas
                 {
-                    string fileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(Fotografia.FileName);
-                    string filePath = Path.Combine(_hostEnvironment.WebRootPath, "images", fileName);
+                    Nome = vagaDTO.Nome,
+                    PeriodoVoluntariado = vagaDTO.PeriodoVoluntariado,
+                    Local = vagaDTO.Local,
+                    Descricao = vagaDTO.Descricao,
+                    Fotografia = ProcessImage(vagaDTO.Fotografia, _hostEnvironment.WebRootPath)
+                };
 
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await Fotografia.CopyToAsync(fileStream);
-                    }
-
-                    vaga.Fotografia = fileName;
-                }
-                else
-                {
-                    return BadRequest("O campo Fotografia é obrigatório.");
-                }
-
-                vaga.VagasCategorias = vaga.CategoriaIds.Select(id => new VagaCategoria { CategoriaId = id }).ToList();
+                vaga.VagasCategorias = vagaDTO.Categorias.Select(categoriaId => new VagaCategoria { CategoriaId = categoriaId }).ToList();
 
                 _context.Vagas.Add(vaga);
                 await _context.SaveChangesAsync();
@@ -88,17 +114,15 @@ namespace UnityHub.Controllers
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Erro ao criar vaga: {ex.Message}");
+                _logger.LogError(ex, "Erro ao criar vaga: {Message}", ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao criar vaga.");
             }
         }
 
-
-        // PUT: api/Vagas/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutVagas(int id, [FromForm] Vagas vaga, [FromForm] IFormFile Fotografia)
+        public async Task<IActionResult> PutVagas(int id, [FromBody] VagaDTO vagaDTO)
         {
-            if (id != vaga.Id)
+            if (id != vagaDTO.Id)
             {
                 return BadRequest();
             }
@@ -119,26 +143,14 @@ namespace UnityHub.Controllers
                     return NotFound();
                 }
 
-                existingVaga.Nome = vaga.Nome;
-                existingVaga.PeriodoVoluntariado = vaga.PeriodoVoluntariado;
-                existingVaga.Local = vaga.Local;
-                existingVaga.Descricao = vaga.Descricao;
-
-                if (Fotografia != null && Fotografia.Length > 0)
-                {
-                    string fileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(Fotografia.FileName);
-                    string filePath = Path.Combine(_hostEnvironment.WebRootPath, "images", fileName);
-
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await Fotografia.CopyToAsync(fileStream);
-                    }
-
-                    existingVaga.Fotografia = fileName;
-                }
+                existingVaga.Nome = vagaDTO.Nome;
+                existingVaga.PeriodoVoluntariado = vagaDTO.PeriodoVoluntariado;
+                existingVaga.Local = vagaDTO.Local;
+                existingVaga.Descricao = vagaDTO.Descricao;
+                existingVaga.Fotografia = ProcessImage(vagaDTO.Fotografia, _hostEnvironment.WebRootPath);
 
                 existingVaga.VagasCategorias.Clear();
-                foreach (var categoriaId in vaga.CategoriaIds)
+                foreach (var categoriaId in vagaDTO.Categorias)
                 {
                     existingVaga.VagasCategorias.Add(new VagaCategoria { VagaId = id, CategoriaId = categoriaId });
                 }
@@ -161,12 +173,11 @@ namespace UnityHub.Controllers
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Erro ao atualizar vaga: {ex.Message}");
+                _logger.LogError(ex, "Erro ao atualizar vaga: {Message}", ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao atualizar vaga.");
             }
         }
 
-        // DELETE: api/Vagas/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVagas(int id)
         {
@@ -188,13 +199,49 @@ namespace UnityHub.Controllers
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Erro ao deletar vaga: {ex.Message}");
+                _logger.LogError(ex, "Erro ao deletar vaga: {Message}", ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao deletar vaga.");
             }
         }
+
         private bool VagasExists(int id)
         {
             return _context.Vagas.Any(e => e.Id == id);
+        }
+
+        private string ProcessImage(string base64Image, string webRootPath)
+        {
+            if (string.IsNullOrEmpty(base64Image))
+                return null;
+
+            if (base64Image.StartsWith("data:image/"))
+            {
+                int startIndex = base64Image.IndexOf("/") + 1;
+                int endIndex = base64Image.IndexOf(";");
+                string extFoto = base64Image.Substring(startIndex, endIndex - startIndex);
+
+                string base64String = base64Image.Substring(base64Image.IndexOf(',') + 1);
+
+                byte[] imageBytes = Convert.FromBase64String(base64String);
+
+                string fileName = Guid.NewGuid().ToString() + "." + extFoto;
+                string filePath = Path.Combine(webRootPath, "images", fileName);
+
+                // Verifica se o diretório "images" existe, e o cria se não existir
+                if (!Directory.Exists(Path.Combine(webRootPath, "images")))
+                {
+                    Directory.CreateDirectory(Path.Combine(webRootPath, "images"));
+                }
+
+                using (FileStream fs = new FileStream(filePath, FileMode.Create))
+                {
+                    fs.Write(imageBytes, 0, imageBytes.Length);
+                }
+
+                return fileName;
+            }
+
+            return base64Image; // Caso a imagem já esteja no formato correto
         }
     }
 }

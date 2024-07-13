@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 using UnityHub.Data;
 using UnityHub.Models;
 
@@ -9,13 +10,17 @@ var connectionString = builder.Configuration.GetConnectionString("UnityHubContex
 
 // Configuração do DbContext com SQL Server
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+{
+    options.UseSqlServer(connectionString);
+});
 
 // Configuração dos serviços de identidade
 builder.Services.AddDefaultIdentity<Utilizadores>(options =>
-    options.SignIn.RequireConfirmedAccount = false)
-    .AddRoles<IdentityRole>()  // Adiciona suporte a roles
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+{
+    options.SignIn.RequireConfirmedAccount = false;
+})
+.AddRoles<IdentityRole>() // Adiciona suporte a roles
+.AddEntityFrameworkStores<ApplicationDbContext>();
 
 // Configuração do CORS
 builder.Services.AddCors(options =>
@@ -30,8 +35,13 @@ builder.Services.AddCors(options =>
 });
 
 // Adição dos controladores com views
-builder.Services.AddControllersWithViews();
-builder.Services.AddControllers();
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.MaxDepth = 64; // Define a profundidade máxima desejada
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+
+    });
 
 var app = builder.Build();
 
