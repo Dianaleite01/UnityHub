@@ -10,7 +10,7 @@ using UnityHub.ViewModels;
 
 namespace UnityHub.Controllers
 {
-    [Authorize(Roles = "admin")]
+
     public class UtilizadoresController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -31,6 +31,7 @@ namespace UnityHub.Controllers
         }
 
         // GET: Utilizadores/Details/5
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null)
@@ -69,6 +70,7 @@ namespace UnityHub.Controllers
         }
 
         // GET: Utilizadores/Edit/5
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -87,6 +89,7 @@ namespace UnityHub.Controllers
         // POST: Utilizadores/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(string id, [Bind("Id,Nome,Telemovel,Email,DataNascimento,Cidade,Pais")] Utilizadores utilizadores)
         {
             if (id != utilizadores.Id)
@@ -118,6 +121,7 @@ namespace UnityHub.Controllers
         }
 
         // GET: Utilizadores/Delete/5
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -138,6 +142,7 @@ namespace UnityHub.Controllers
         // POST: Utilizadores/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var utilizadores = await _context.Utilizadores.FindAsync(id);
