@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using System.Text.Json.Serialization;
 using UnityHub.Data;
 using UnityHub.Models;
@@ -16,7 +19,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddMemoryCache();
 
-
 // Configuração dos serviços de identidade
 builder.Services.AddDefaultIdentity<Utilizadores>(options =>
 {
@@ -30,6 +32,28 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Utilizadores/Login"; // Rota para a página de login
 });
+
+// Adiciona configuração JWT
+var jwtSecret = builder.Configuration["JwtSecret"];
+var key = Encoding.ASCII.GetBytes(jwtSecret);
+
+builder.Services.AddAuthentication()
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Utilizadores/Login"; // Configuração de cookies para a aplicação web
+    })
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+    {
+        options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
 
 // Configuração do CORS
 builder.Services.AddCors(options =>
@@ -64,6 +88,7 @@ app.UseCors("AllowAllOrigins");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+
 app.UseAuthentication(); // Adicionado para autenticação
 app.UseAuthorization();
 

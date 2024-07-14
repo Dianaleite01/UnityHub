@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using UnityHub.Data;
 using UnityHub.Models;
 using UnityHub.ViewModels;
+import UnityHub.Data;
+import UnityHub.Models;
+import UnityHub.ViewModels;
 
 namespace UnityHub.Controllers
 {
@@ -349,6 +352,7 @@ namespace UnityHub.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+
         // Método GET para exibir o formulário de edição de perfil
         [HttpGet]
         [Authorize]
