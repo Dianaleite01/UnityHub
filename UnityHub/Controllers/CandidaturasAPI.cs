@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -6,8 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityHub.Data;
 using UnityHub.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authorization;
 
 namespace UnityHub.Controllers
 {
@@ -53,29 +52,11 @@ namespace UnityHub.Controllers
             return candidatura;
         }
 
-        // Método GET para verificar se o utilizador atual já se candidatou a uma vaga específica
-        [HttpGet("hasApplied/{vagaId}")]
-        [Authorize]
-        public async Task<ActionResult<bool>> HasApplied(int vagaId)
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return Unauthorized();
-            }
-
-            var existingCandidatura = await _context.Candidaturas
-                .AnyAsync(c => c.UtilizadorFK == user.Id && c.VagaFK == vagaId);
-
-            return Ok(existingCandidatura);
-        }
-
         // Método POST para criar uma nova candidatura
-        [HttpPost]
-        [Authorize]
+        [HttpPost("Create")]
         public async Task<ActionResult<Candidaturas>> CreateCandidatura([FromBody] CreateCandidaturaRequest request)
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
                 return Unauthorized();
@@ -116,11 +97,11 @@ namespace UnityHub.Controllers
         public class CreateCandidaturaRequest
         {
             public int VagaFK { get; set; }
+            public string Email { get; set; }
         }
 
         // Método PUT para editar uma candidatura existente
         [HttpPut("{id}")]
-        [Authorize]
         public async Task<IActionResult> EditCandidatura(int id, [FromBody] Candidaturas candidatura)
         {
             if (id != candidatura.Id)
@@ -155,24 +136,8 @@ namespace UnityHub.Controllers
             return NoContent();
         }
 
-        // Método GET para verificar se o utilizador atual é administrador
-        [HttpGet("isAdmin")]
-        [Authorize]
-        public async Task<ActionResult<bool>> IsAdmin()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return Unauthorized();
-            }
-
-            var isAdmin = await _userManager.IsInRoleAsync(user, "admin");
-            return Ok(isAdmin);
-        }
-
         // Método POST para aceitar uma candidatura
         [HttpPost("accept/{id}")]
-        [Authorize(Roles = "admin")]
         public async Task<IActionResult> AcceptCandidatura(int id)
         {
             var candidatura = await _context.Candidaturas.FindAsync(id);
@@ -190,7 +155,6 @@ namespace UnityHub.Controllers
 
         // Método POST para rejeitar uma candidatura
         [HttpPost("reject/{id}")]
-        [Authorize(Roles = "admin")]
         public async Task<IActionResult> RejectCandidatura(int id)
         {
             var candidatura = await _context.Candidaturas.FindAsync(id);
@@ -208,7 +172,6 @@ namespace UnityHub.Controllers
 
         // Método DELETE para eliminar uma candidatura
         [HttpDelete("{id}")]
-        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteCandidatura(int id)
         {
             var candidatura = await _context.Candidaturas.FindAsync(id);

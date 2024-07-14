@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -15,6 +16,7 @@ namespace UnityHub.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UtilizadoresAPI : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -51,6 +53,7 @@ namespace UnityHub.Controllers
 
         // POST: api/UtilizadoresAPI/Login
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginViewModel model)
         {
             if (ModelState.IsValid)
@@ -84,6 +87,7 @@ namespace UnityHub.Controllers
 
         // POST: api/UtilizadoresAPI/Register
         [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
         {
             if (ModelState.IsValid)
@@ -116,6 +120,17 @@ namespace UnityHub.Controllers
         {
             await _signInManager.SignOutAsync();
             return Ok(new { message = "Logout realizado com sucesso!" });
+        }
+
+        // Método GET para obter todos os utilizadores
+        [HttpGet("list")]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<Utilizadores>>> GetUtilizadores()
+        {
+            var utilizadores = await _context.Utilizadores
+                .AsNoTracking()
+                .ToListAsync();
+            return Ok(utilizadores);
         }
     }
 }
