@@ -32,22 +32,23 @@ namespace UnityHub.Controllers
         // GET: Vagas/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Vagas == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var vagas = await _context.Vagas
+            var vaga = await _context.Vagas
                 .Include(v => v.VagasCategorias)
-                .ThenInclude(vc => vc.Categoria)
+                    .ThenInclude(vc => vc.Categoria)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (vagas == null)
+            if (vaga == null)
             {
                 return NotFound();
             }
 
-            return View(vagas);
+            return View(vaga);
         }
+
 
         // GET: Vagas/Create
         public IActionResult Create()

@@ -1,0 +1,39 @@
+﻿@model UnityHub.Models.Candidaturas
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+
+<h3>Tem certeza que deseja deletar esta candidatura?</h3>
+<div>
+    <h4>Candidaturas</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Nome da Vaga
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Vaga.Nome
+        </dd>
+        <dt class="col-sm-2">
+            Nome do Utilizador
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Utilizador.Nome
+        </dd>
+        <dt class="col-sm-2">
+            Estado
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Estado
+        </dd>
+    </dl>
+
+    <form asp-action="DeleteConfirmed">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>

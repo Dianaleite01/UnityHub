@@ -6,6 +6,13 @@
 
 <h2>Detalhes da Vaga</h2>
 
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
 <div class="card mb-4 shadow-sm">
     <img src="@Url.Content("~/images/" + Model.Fotografia)" class="card-img-top" alt="Imagem da Vaga">
     <div class="card-body">
@@ -17,7 +24,7 @@
         <form asp-action="Create" asp-controller="Candidaturas">
             <input type="hidden" name="VagaFK" value="@Model.Id" />
             <input type="hidden" name="Estado" value="Pendente" />
-            <input type="hidden" name="UtilizadorFK" value="@User.Identity.Name" /> 
+            <input type="hidden" name="UtilizadorFK" value="@User.Identity.Name" />
             <button type="submit" class="btn btn-success">Candidatar-se</button>
         </form>
     </div>

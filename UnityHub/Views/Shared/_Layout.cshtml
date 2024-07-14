@@ -28,7 +28,7 @@
                     </a>
                 </li>
                 <li>
-                    <a asp-area="" asp-controller="Candidaturas" asp-action="Index" class="nav-links">
+                    <a asp-area="" asp-controller="Candidaturas" asp-action="All" class="nav-links">
                         Candidaturas
                     </a>
                 </li>
@@ -50,10 +50,7 @@
                         <i class="fas fa-envelope"></i> Contacto
                     </a>
                 </li>
-            }
-            @if (User.Identity.IsAuthenticated)
-            {
-                if (!User.IsInRole("admin")) // Apenas para usuários que não são administradores
+                @if (User.Identity.IsAuthenticated)
                 {
                     <li>
                         <a asp-area="" asp-controller="Utilizadores" asp-action="Perfil" class="nav-links">
@@ -61,6 +58,9 @@
                         </a>
                     </li>
                 }
+            }
+            @if (User.Identity.IsAuthenticated)
+            {
                 <li>
                     <form asp-controller="Utilizadores" asp-action="Logout" method="post" id="logoutForm" style="display: none;"></form>
                     <a href="javascript:document.getElementById('logoutForm').submit();" class="nav-links">
