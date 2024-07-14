@@ -14,6 +14,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString);
 });
 
+builder.Services.AddMemoryCache();
+
+
 // Configuração dos serviços de identidade
 builder.Services.AddDefaultIdentity<Utilizadores>(options =>
 {
@@ -26,7 +29,6 @@ builder.Services.AddDefaultIdentity<Utilizadores>(options =>
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Utilizadores/Login"; // Rota para a página de login
-    options.AccessDeniedPath = "/Utilizadores/AccessDenied"; // Rota para a página de acesso negado
 });
 
 // Configuração do CORS

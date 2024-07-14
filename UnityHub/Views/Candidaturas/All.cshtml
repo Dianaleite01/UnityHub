@@ -1,0 +1,48 @@
+﻿@model IEnumerable<UnityHub.Models.Candidaturas>
+
+@{
+    ViewData["Title"] = "Todas as Candidaturas";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Utilizador</th>
+            <th>Vaga</th>
+            <th>Estado</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var candidatura in Model)
+        {
+            <tr>
+                <td>@candidatura.Utilizador.Email</td>
+                <td>@candidatura.Vaga.Nome</td>
+                <td>@candidatura.Estado</td>
+                <td>
+                    @if (candidatura.Estado == "Pendente")
+                    {
+                        <form asp-action="Accept" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@candidatura.Id" />
+                            <button type="submit" class="btn btn-success">Aceitar</button>
+                        </form>
+                        <form asp-action="Reject" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@candidatura.Id" />
+                            <button type="submit" class="btn btn-danger">Rejeitar</button>
+                        </form>
+                    }
+                    else if (candidatura.Estado == "Rejeitada" || candidatura.Estado == "Aceite")
+                    {
+                        <form asp-action="Delete" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@candidatura.Id" />
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

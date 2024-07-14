@@ -24,7 +24,7 @@ namespace UnityHub.Controllers
             _signInManager = signInManager;
         }
 
-        // Método GET para exibir a lista de utilizadores
+        // Método GET para exibir a lista de utilizadores (apenas para administradores)
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> Index()
         {
@@ -50,14 +50,14 @@ namespace UnityHub.Controllers
             return View(utilizadores);
         }
 
-        // Método GET para exibir o formulário de criação de um novo utilizador
+        // Método GET para exibir o formulário de criação de um novo utilizador (acesso anónimo permitido)
         [AllowAnonymous]
         public IActionResult Create()
         {
             return View();
         }
 
-        // Método POST para criar um novo utilizador
+        // Método POST para criar um novo utilizador (acesso anónimo permitido)
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
@@ -190,7 +190,7 @@ namespace UnityHub.Controllers
             return _context.Utilizadores.Any(e => e.Id == id);
         }
 
-        // Método GET para exibir o formulário de registo de um novo utilizador
+        // Método GET para exibir o formulário de registo de um novo utilizador (acesso anónimo permitido)
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Register()
@@ -198,7 +198,7 @@ namespace UnityHub.Controllers
             return View();
         }
 
-        // Método POST para registar um novo utilizador
+        // Método POST para registar um novo utilizador (acesso anónimo permitido)
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
@@ -230,7 +230,7 @@ namespace UnityHub.Controllers
             return View(model);
         }
 
-        // Método GET para exibir o formulário de login
+        // Método GET para exibir o formulário de login (acesso anónimo permitido)
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Login()
@@ -238,7 +238,7 @@ namespace UnityHub.Controllers
             return View();
         }
 
-        // Método POST para efetuar o login
+        // Método POST para efetuar o login (acesso anónimo permitido)
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
@@ -294,6 +294,12 @@ namespace UnityHub.Controllers
                 return NotFound();
             }
 
+            // Busca as candidaturas do utilizador
+            var candidaturas = await _context.Candidaturas
+                .Include(c => c.Vaga)
+                .Where(c => c.UtilizadorFK == user.Id)
+                .ToListAsync();
+
             var model = new ProfileViewModel
             {
                 Nome = user.Nome,
@@ -301,7 +307,8 @@ namespace UnityHub.Controllers
                 DataNascimento = user.DataNascimento,
                 Cidade = user.Cidade,
                 Pais = user.Pais,
-                Email = user.Email
+                Email = user.Email,
+                Candidaturas = candidaturas // Adiciona as candidaturas ao modelo
             };
 
             return View(model);
@@ -341,6 +348,66 @@ namespace UnityHub.Controllers
             }
 
             return RedirectToAction("Index", "Home");
+        }
+        // Método GET para exibir o formulário de edição de perfil
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> EditProfile()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var model = new ProfileViewModel
+            {
+                Nome = user.Nome,
+                Telemovel = user.Telemovel,
+                DataNascimento = user.DataNascimento,
+                Cidade = user.Cidade,
+                Pais = user.Pais,
+                Email = user.Email
+            };
+
+            return View(model);
+        }
+
+        // Método POST para atualizar o perfil do utilizador
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> EditProfile(ProfileViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.Nome = model.Nome;
+            user.Telemovel = model.Telemovel;
+            user.DataNascimento = model.DataNascimento;
+            user.Cidade = model.Cidade;
+            user.Pais = model.Pais;
+            user.Email = model.Email;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                return View(model);
+            }
+
+            return RedirectToAction("Perfil");
         }
     }
 }

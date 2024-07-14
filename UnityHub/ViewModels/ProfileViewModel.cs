@@ -1,4 +1,6 @@
-﻿namespace UnityHub.ViewModels
+﻿using UnityHub.Models;
+
+namespace UnityHub.ViewModels
 {
     public class ProfileViewModel
     {
@@ -8,5 +10,6 @@
         public string Cidade { get; set; }
         public string Pais { get; set; }
         public string Email { get; set; }
+        public List<Candidaturas> Candidaturas { get; set; }
     }
 }

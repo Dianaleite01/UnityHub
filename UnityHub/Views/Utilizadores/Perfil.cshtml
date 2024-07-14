@@ -1,39 +1,46 @@
 ﻿@model UnityHub.ViewModels.ProfileViewModel
 
-<h2>Perfil</h2>
-<form asp-action="Perfil" method="post">
-    <div class="form-group">
-        <label asp-for="Nome" class="control-label"></label>
-        <input asp-for="Nome" class="form-control" />
-        <span asp-validation-for="Nome" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Telemovel" class="control-label"></label>
-        <input asp-for="Telemovel" class="form-control" />
-        <span asp-validation-for="Telemovel" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="DataNascimento" class="control-label"></label>
-        <input asp-for="DataNascimento" class="form-control" type="date" /> 
-        <span asp-validation-for="DataNascimento" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Cidade" class="control-label"></label>
-        <input asp-for="Cidade" class="form-control" />
-        <span asp-validation-for="Cidade" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Pais" class="control-label"></label>
-        <input asp-for="Pais" class="form-control" />
-        <span asp-validation-for="Pais" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Email" class="control-label"></label>
-        <input asp-for="Email" class="form-control" readonly />
-    </div>
-    <button type="submit" class="btn btn-primary">Guardar</button>
-</form>
+@{
+    ViewData["Title"] = "Perfil";
+}
+
+<h2>@ViewData["Title"]</h2>
 
 <div>
-    <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">Voltar</a>
+    <h3>Informações do Usuário</h3>
+    <p><strong>Nome:</strong> @Model.Nome</p>
+    <p><strong>Telemóvel:</strong> @Model.Telemovel</p>
+    <p><strong>Email:</strong> @Model.Email</p>
+    <p><strong>Data de Nascimento:</strong> @Model.DataNascimento.ToString("dd/MM/yyyy")</p>
+    <p><strong>Cidade:</strong> @Model.Cidade</p>
+    <p><strong>Pais:</strong> @Model.Pais</p>
+    <a asp-action="EditProfile" class="btn btn-primary">Editar Perfil</a>
+</div>
+
+<div>
+    <h3>Minhas Candidaturas</h3>
+    @if (Model.Candidaturas != null && Model.Candidaturas.Any())
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Vaga</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var candidatura in Model.Candidaturas)
+                {
+                    <tr>
+                        <td>@candidatura.Vaga.Nome</td>
+                        <td>@candidatura.Estado</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>Você ainda não se candidatou a nenhuma vaga.</p>
+    }
 </div>
