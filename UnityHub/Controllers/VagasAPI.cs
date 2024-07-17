@@ -20,6 +20,7 @@ namespace UnityHub.Controllers
         private readonly IWebHostEnvironment _hostEnvironment;
         private readonly ILogger<VagasAPI> _logger;
 
+        // Construtor para injetar dependências necessárias
         public VagasAPI(ApplicationDbContext context, IWebHostEnvironment hostEnvironment, ILogger<VagasAPI> logger)
         {
             _context = context;
@@ -27,6 +28,7 @@ namespace UnityHub.Controllers
             _logger = logger;
         }
 
+        // Método HTTP GET para obter todas as vagas
         [HttpGet]
         public async Task<ActionResult<IEnumerable<VagaDTO>>> GetVagas()
         {
@@ -34,8 +36,8 @@ namespace UnityHub.Controllers
             {
                 _logger.LogInformation("Fetching vagas from database.");
                 var vagas = await _context.Vagas
-                    .Include(v => v.VagasCategorias)
-                    .ThenInclude(vc => vc.Categoria)
+                    .Include(v => v.VagasCategorias) // Incluir relação com VagasCategorias
+                    .ThenInclude(vc => vc.Categoria) // Incluir relação com Categoria
                     .ToListAsync();
 
                 var vagasDTO = vagas.Select(v => new VagaDTO
@@ -46,7 +48,7 @@ namespace UnityHub.Controllers
                     Local = v.Local,
                     Descricao = v.Descricao,
                     Fotografia = v.Fotografia,
-                    Categorias = v.VagasCategorias.Select(vc => vc.CategoriaId).ToList() // Usando CategoriaId em vez de CategoriaDTO
+                    Categorias = v.VagasCategorias.Select(vc => vc.CategoriaId).ToList() // Mapeamento de categorias
                 }).ToList();
 
                 _logger.LogInformation("Returning {Count} vagas.", vagasDTO.Count);
@@ -59,12 +61,13 @@ namespace UnityHub.Controllers
             }
         }
 
+        // Método HTTP GET para obter uma vaga específica por ID
         [HttpGet("{id}")]
         public async Task<ActionResult<VagaDTO>> GetVagas(int id)
         {
             var vaga = await _context.Vagas
-                .Include(v => v.VagasCategorias)
-                .ThenInclude(vc => vc.Categoria)
+                .Include(v => v.VagasCategorias) // Incluir relação com VagasCategorias
+                .ThenInclude(vc => vc.Categoria) // Incluir relação com Categoria
                 .FirstOrDefaultAsync(v => v.Id == id);
 
             if (vaga == null)
@@ -80,12 +83,13 @@ namespace UnityHub.Controllers
                 Local = vaga.Local,
                 Descricao = vaga.Descricao,
                 Fotografia = vaga.Fotografia,
-                Categorias = vaga.VagasCategorias.Select(vc => vc.CategoriaId).ToList() // Usando CategoriaId em vez de CategoriaDTO
+                Categorias = vaga.VagasCategorias.Select(vc => vc.CategoriaId).ToList() // Mapeamento de categorias
             };
 
             return Ok(vagaDTO);
         }
 
+        // Método HTTP POST para criar uma nova vaga
         [HttpPost]
         public async Task<ActionResult<Vagas>> PostVagas([FromBody] VagaDTO vagaDTO)
         {
@@ -102,9 +106,10 @@ namespace UnityHub.Controllers
                     PeriodoVoluntariado = vagaDTO.PeriodoVoluntariado,
                     Local = vagaDTO.Local,
                     Descricao = vagaDTO.Descricao,
-                    Fotografia = ProcessImage(vagaDTO.Fotografia, _hostEnvironment.WebRootPath)
+                    Fotografia = ProcessImage(vagaDTO.Fotografia, _hostEnvironment.WebRootPath) // Processar imagem
                 };
 
+                // Mapear categorias para a nova vaga
                 vaga.VagasCategorias = vagaDTO.Categorias.Select(categoriaId => new VagaCategoria { CategoriaId = categoriaId }).ToList();
 
                 _context.Vagas.Add(vaga);
@@ -119,6 +124,7 @@ namespace UnityHub.Controllers
             }
         }
 
+        // Método HTTP PUT para atualizar uma vaga existente
         [HttpPut("{id}")]
         public async Task<IActionResult> PutVagas(int id, [FromBody] VagaDTO vagaDTO)
         {
@@ -135,7 +141,7 @@ namespace UnityHub.Controllers
             try
             {
                 var existingVaga = await _context.Vagas
-                    .Include(v => v.VagasCategorias)
+                    .Include(v => v.VagasCategorias) // Incluir relação com VagasCategorias
                     .FirstOrDefaultAsync(v => v.Id == id);
 
                 if (existingVaga == null)
@@ -147,8 +153,9 @@ namespace UnityHub.Controllers
                 existingVaga.PeriodoVoluntariado = vagaDTO.PeriodoVoluntariado;
                 existingVaga.Local = vagaDTO.Local;
                 existingVaga.Descricao = vagaDTO.Descricao;
-                existingVaga.Fotografia = ProcessImage(vagaDTO.Fotografia, _hostEnvironment.WebRootPath);
+                existingVaga.Fotografia = ProcessImage(vagaDTO.Fotografia, _hostEnvironment.WebRootPath); // Processar imagem
 
+                // Atualizar categorias da vaga existente
                 existingVaga.VagasCategorias.Clear();
                 foreach (var categoriaId in vagaDTO.Categorias)
                 {
@@ -178,11 +185,12 @@ namespace UnityHub.Controllers
             }
         }
 
+        // Método HTTP DELETE para eliminar uma vaga por ID
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVagas(int id)
         {
             var vaga = await _context.Vagas
-                .Include(v => v.VagasCategorias)
+                .Include(v => v.VagasCategorias) // Incluir relação com VagasCategorias
                 .FirstOrDefaultAsync(v => v.Id == id);
 
             if (vaga == null)
@@ -204,11 +212,13 @@ namespace UnityHub.Controllers
             }
         }
 
+        // Método auxiliar para verificar se uma vaga existe
         private bool VagasExists(int id)
         {
             return _context.Vagas.Any(e => e.Id == id);
         }
 
+        // Método para processar imagens
         private string ProcessImage(string base64Image, string webRootPath)
         {
             if (string.IsNullOrEmpty(base64Image))
@@ -227,7 +237,7 @@ namespace UnityHub.Controllers
                 string fileName = Guid.NewGuid().ToString() + "." + extFoto;
                 string filePath = Path.Combine(webRootPath, "images", fileName);
 
-                // Verifica se o diretório "images" existe, e o cria se não existir
+                // Verifica se o diretório "images" existe, e cria-o se não existir
                 if (!Directory.Exists(Path.Combine(webRootPath, "images")))
                 {
                     Directory.CreateDirectory(Path.Combine(webRootPath, "images"));
