@@ -88,11 +88,6 @@ namespace UnityHub.Controllers
                 return NotFound();
             }
 
-            // Verifica se o usuário é o administrador e impede a edição
-            if (utilizadores.UserName == "admin@UnityHub.pt")
-            {
-                return Forbid();
-            }
 
             if (ModelState.IsValid)
             {
