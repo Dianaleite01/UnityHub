@@ -4,68 +4,114 @@
     ViewData["Title"] = "Registar-se";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="container mt-5">
+    <h1 class="text-center mb-4">@ViewData["Title"]</h1>
 
-<h4>Crie uma nova conta.</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form method="post">
-            <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title mb-4 text-center">Crie uma nova conta</h4>
 
-            <div class="form-group">
-                <label asp-for="Input.Nome"></label>
-                <input asp-for="Input.Nome" class="form-control" />
-                <span asp-validation-for="Input.Nome" class="text-danger"></span>
+                    <form method="post" id="registerForm" novalidate>
+                        <!-- Resumo de Validação -->
+                        <div asp-validation-summary="All" class="alert alert-danger" style="display: none;"></div>
+
+                        <!-- Campos do Formulário -->
+                        <div class="mb-3">
+                            <label asp-for="Input.Nome" class="form-label"></label>
+                            <input asp-for="Input.Nome" class="form-control" />
+                            <span asp-validation-for="Input.Nome" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Input.Telemovel" class="form-label"></label>
+                            <input asp-for="Input.Telemovel" class="form-control" />
+                            <span asp-validation-for="Input.Telemovel" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Input.DataNascimento" class="form-label"></label>
+                            <input asp-for="Input.DataNascimento" class="form-control" type="date" />
+                            <span asp-validation-for="Input.DataNascimento" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Input.Cidade" class="form-label"></label>
+                            <input asp-for="Input.Cidade" class="form-control" />
+                            <span asp-validation-for="Input.Cidade" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Input.Pais" class="form-label"></label>
+                            <input asp-for="Input.Pais" class="form-control" />
+                            <span asp-validation-for="Input.Pais" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Input.Email" class="form-label"></label>
+                            <input asp-for="Input.Email" class="form-control" type="email" />
+                            <span asp-validation-for="Input.Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Input.Password" class="form-label"></label>
+                            <input asp-for="Input.Password" class="form-control" type="password" />
+                            <span asp-validation-for="Input.Password" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Input.ConfirmPassword" class="form-label"></label>
+                            <input asp-for="Input.ConfirmPassword" class="form-control" type="password" />
+                            <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary" id="registerButton">
+                                <i class="fas fa-user-plus"></i> Registar
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Spinner de Carregamento -->
+                    <div id="loadingSpinner" class="text-center mt-3" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                        </div>
+                        <p>A processar o seu registo...</p>
+                    </div>
+
+                    <div class="mt-3 text-center">
+                        <p>Já tem uma conta? <a asp-page="/Account/Login">Entrar</a></p>
+                    </div>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label asp-for="Input.Telemovel"></label>
-                <input asp-for="Input.Telemovel" class="form-control" />
-                <span asp-validation-for="Input.Telemovel" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Input.DataNascimento"></label>
-                <input asp-for="Input.DataNascimento" class="form-control" type="date" />
-                <span asp-validation-for="Input.DataNascimento" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Input.Cidade"></label>
-                <input asp-for="Input.Cidade" class="form-control" />
-                <span asp-validation-for="Input.Cidade" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Input.Pais"></label>
-                <input asp-for="Input.Pais" class="form-control" />
-                <span asp-validation-for="Input.Pais" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Input.Email"></label>
-                <input asp-for="Input.Email" class="form-control" />
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Input.Password"></label>
-                <input asp-for="Input.Password" class="form-control" />
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Input.ConfirmPassword"></label>
-                <input asp-for="Input.ConfirmPassword" class="form-control" />
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Registar</button>
-        </form>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+            // Esconde o resumo de validação inicialmente
+            var validationSummary = $('div.validation-summary-errors');
+            if (validationSummary.find('ul li').length === 0) {
+                validationSummary.hide();
+            }
+
+            $('#registerForm').on('submit', function (e) {
+                if ($(this).valid()) {
+                    // Formulário é válido, mostrar spinner
+                    $('#registerButton').prop('disabled', true);
+                    $('#loadingSpinner').show();
+                } else {
+                    // Formulário inválido, evitar submissão
+                    e.preventDefault();
+                    // Mostrar resumo de validação
+                    validationSummary.show();
+                }
+            });
+        });
+    </script>
 }
