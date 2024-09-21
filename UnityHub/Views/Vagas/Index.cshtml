@@ -1,60 +1,45 @@
 ﻿@model IEnumerable<UnityHub.Models.Vagas>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Vagas Disponíveis";
 }
 
-<h1>Vagas</h1>
+<h1 class="text-center my-4">@ViewData["Title"]</h1>
 
-<p>
-    <a asp-action="Create">Criar</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Nome)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PeriodoVoluntariado)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Local)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Descricao)
-            </th>
-            <th>
-                Fotografia
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
+<div class="container">
+    <div class="text-end mb-4">
+        <a asp-action="Create" class="btn btn-primary btn-lg btn-create-vaga">
+            <i class="fas fa-plus"></i> Criar Nova Vaga
+        </a>
+    </div>
+
+    <div class="row">
         @foreach (var item in Model)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Nome)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PeriodoVoluntariado)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Local)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Descricao)
-                </td>
-                <td>
-                    <img src="~/images/@item.Fotografia" alt="@item.Nome" style="max-height: 100px; max-width: 100px;" />
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Eliminar</a>
-                </td>
-            </tr>
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    <img src="~/images/@item.Fotografia" class="card-img-top" alt="@item.Nome" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">@item.Nome</h5>
+                        <p class="card-text"><strong>Período:</strong> @item.PeriodoVoluntariado</p>
+                        <p class="card-text"><strong>Local:</strong> @item.Local</p>
+                        <p class="card-text">@item.Descricao</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="btn-group">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-info-circle"></i> Detalhes
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         }
-    </tbody>
-</table>
+    </div>
+</div>

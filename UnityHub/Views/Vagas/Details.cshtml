@@ -1,52 +1,35 @@
 ﻿@model UnityHub.Models.Vagas
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes da Vaga";
 }
 
-<h1>Detalhes</h1>
-
-<div>
-    <h4>Vagas</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Nome)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Nome)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.PeriodoVoluntariado)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.PeriodoVoluntariado)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Local)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Local)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Descricao)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Descricao)
-        </dd>
-        <dt class="col-sm-2">
-            Categorias
-        </dt>
-        <dd class="col-sm-10">
-            @foreach (var categoria in Model.VagasCategorias)
-            {
-                <span>@categoria.Categoria.Nome</span>
-                <br />
-            }
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Editar</a> |
-    <a asp-action="Index">Voltar</a>
+<div class="container mt-5">
+    <div class="card mb-4 shadow-sm">
+        @if (!string.IsNullOrEmpty(Model.Fotografia))
+        {
+            <img src="~/images/@Model.Fotografia" class="card-img-top" alt="@Model.Nome" style="height: 400px; object-fit: cover;">
+        }
+        <div class="card-body">
+            <h2 class="card-title">@Model.Nome</h2>
+            <p class="card-text"><strong>Período de Voluntariado:</strong> @Model.PeriodoVoluntariado</p>
+            <p class="card-text"><strong>Local:</strong> @Model.Local</p>
+            <p class="card-text"><strong>Descrição:</strong> @Model.Descricao</p>
+            <p class="card-text">
+                <strong>Categorias:</strong>
+                @foreach (var categoria in Model.VagasCategorias)
+                {
+                    <span class="badge bg-secondary">@categoria.Categoria.Nome</span>
+                }
+            </p>
+            <div class="mt-4">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
