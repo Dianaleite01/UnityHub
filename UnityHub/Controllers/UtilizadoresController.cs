@@ -53,28 +53,6 @@ namespace UnityHub.Controllers
             return View(utilizadores);
         }
 
-        // Método GET para exibir o formulário de criação de um novo utilizador (acesso anónimo permitido)
-        [AllowAnonymous]
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // Método POST para criar um novo utilizador (acesso anónimo permitido)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [AllowAnonymous]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Telemovel,Email,DataNascimento,Cidade,Pais")] Utilizadores utilizadores)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(utilizadores);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(utilizadores);
-        }
-
         // Método GET para exibir o formulário de edição de um utilizador específico (apenas para administradores)
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(string id)
@@ -193,46 +171,7 @@ namespace UnityHub.Controllers
             return _context.Utilizadores.Any(e => e.Id == id);
         }
 
-        // Método GET para exibir o formulário de registo de um novo utilizador (acesso anónimo permitido)
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult Register()
-        {
-            return View();
-        }
-
-        // Método POST para registar um novo utilizador (acesso anónimo permitido)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [AllowAnonymous]
-        public async Task<IActionResult> Register(RegisterViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = new Utilizadores
-                {
-                    UserName = model.Email,
-                    Email = model.Email,
-                    Nome = model.Nome,
-                    Telemovel = model.Telemovel,
-                    DataNascimento = model.DataNascimento,
-                    Cidade = model.Cidade,
-                    Pais = model.Pais
-                };
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
-                }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-            }
-            return View(model);
-        }
-
+        
         // Método GET para exibir o formulário de login (acesso anónimo permitido)
         [HttpGet]
         [AllowAnonymous]
