@@ -30,6 +30,7 @@
                             <i class="fas fa-home"></i> Home
                         </a>
                     </li>
+                  
                     @if (User.Identity.IsAuthenticated && User.IsInRole("admin"))
                     {
                         <li class="nav-item">
@@ -95,7 +96,32 @@
             </div>
         </div>
     </nav>
-
+                }
+            }
+            @if (User.Identity.IsAuthenticated)
+            {
+                <li>
+                    <form asp-controller="Utilizadores" asp-action="Logout" method="post" id="logoutForm" style="display: none;"></form>
+                    <a href="javascript:document.getElementById('logoutForm').submit();" class="nav-links">
+                        Sair
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li>
+                    <a asp-area="Identity" asp-page="/Account/Register" class="nav-links">
+                        Registar
+                    </a>
+                </li>
+                <li>
+                    <a asp-area="Identity" asp-page="/Account/Login" class="nav-links">
+                        Login
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
     <!-- Conteúdo Principal -->
     <div class="container mt-5 pt-5">
         @RenderBody()
