@@ -1,5 +1,67 @@
 ﻿@{
-    ViewData["Title"] = "Contact";
+    ViewData["Title"] = "Contato";
 }
 
+<div class="container mt-5">
+    <h1 class="text-center mb-4">@ViewData["Title"]</h1>
 
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <p class="text-center">
+                Se tiver alguma dúvida ou precisar de mais informações, não hesite em entrar em contato conosco pelo e-mail abaixo ou preencha o formulário.
+            </p>
+
+            <!-- Informações de Contato -->
+            <div class="text-center mb-4">
+                <i class="fas fa-envelope fa-2x mb-2"></i>
+                <h5>Email: <a href="mailto:admin@UnityHub.pt">admin@UnityHub.pt</a></h5>
+            </div>
+
+            <!-- Formulário de Contato -->
+            <form method="post" action="/Home/SendContact">
+                <div class="mb-3">
+                    <label for="nome" class="form-label">Nome</label>
+                    <input type="text" class="form-control" id="nome" name="nome" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">E-mail</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="assunto" class="form-label">Assunto</label>
+                    <input type="text" class="form-control" id="assunto" name="assunto" required>
+                </div>
+                <div class="mb-3">
+                    <label for="mensagem" class="form-label">Mensagem</label>
+                    <textarea class="form-control" id="mensagem" name="mensagem" rows="5" required></textarea>
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-paper-plane"></i> Enviar Mensagem
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Validação do Bootstrap -->
+    <script>
+        // Exemplo de JavaScript para validação do formulário
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
+}
