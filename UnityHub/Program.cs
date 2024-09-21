@@ -30,7 +30,7 @@ builder.Services.AddDefaultIdentity<Utilizadores>(options =>
 // Configura��o de cookies de autentica��o
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = "/Utilizadores/Login"; // Rota para a p�gina de login
+    options.LoginPath = "/Identity/Account/Login"; // Rota para a p�gina de login
 });
 
 // Adiciona configura��o JWT
@@ -40,7 +40,7 @@ var key = Encoding.ASCII.GetBytes(jwtSecret);
 builder.Services.AddAuthentication()
     .AddCookie(options =>
     {
-        options.LoginPath = "/Utilizadores/Login"; // Configura��o de cookies para a aplica��o web
+        options.LoginPath = "/Identity/Account/Login"; // Configura��o de cookies para a aplica��o web
     })
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
     {

@@ -180,43 +180,6 @@ namespace UnityHub.Controllers
             return View();
         }
 
-        // Método POST para efetuar o login (acesso anónimo permitido)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user != null)
-                {
-                    var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-                    if (result.Succeeded)
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
-                    else if (result.IsLockedOut)
-                    {
-                        ModelState.AddModelError(string.Empty, "Conta de utilizador bloqueada.");
-                    }
-                    else if (result.IsNotAllowed)
-                    {
-                        ModelState.AddModelError(string.Empty, "Não tem permissão para fazer login.");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, "Tentativa de login inválida.");
-                    }
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Utilizador não encontrado.");
-                }
-            }
-            return View(model);
-        }
-
         // Método POST para efetuar o logout
         [HttpPost]
         [ValidateAntiForgeryToken]
