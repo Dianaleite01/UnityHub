@@ -71,8 +71,13 @@
             else
             {
                 <li>
-                    <a asp-area="" asp-controller="Utilizadores" asp-action="Register" class="nav-links">
+                    <a asp-area="Identity" asp-page="/Account/Register" class="nav-links">
                         Registar
+                    </a>
+                </li>
+                <li>
+                    <a asp-area="Identity" asp-page="/Account/Login" class="nav-links">
+                        Login
                     </a>
                 </li>
             }
