@@ -1,5 +1,39 @@
 ﻿@{
-    ViewData["Title"] = "About";
+    ViewData["Title"] = "Sobre";
 }
 
+<div class="container mt-5">
+    <h1 class="text-center mb-5">@ViewData["Title"]</h1>
 
+    <div class="row justify-content-center">
+        <!-- Card para Diana Alves Leite -->
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <img src="@Url.Content("~/images/diana.jpg")" class="card-img-top" alt="Diana Alves Leite" style="height: 300px; object-fit: cover;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Diana Alves Leite</h5>
+                    <p class="card-text">Estudante de Engenharia Informática no Instituto Politécnico de Tomar.</p>
+                    <p>
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:aluno23392@ipt.pt">aluno23392@ipt.pt</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card para Gonçalo Barbosa -->
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <img src="@Url.Content("~/images/goncalo.jpg")" class="card-img-top" alt="Gonçalo Barbosa" style="height: 300px; object-fit: cover;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Gonçalo Barbosa</h5>
+                    <p class="card-text">Estudante de Engenharia Informática no Instituto Politécnico de Tomar.</p>
+                    <p>
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:aluno23395@ipt.pt">aluno23395@ipt.pt</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

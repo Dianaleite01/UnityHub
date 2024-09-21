@@ -4,43 +4,83 @@
     ViewData["Title"] = "Perfil";
 }
 
-<h2>@ViewData["Title"]</h2>
+<div class="container mt-5">
+    <h1 class="text-center mb-5">@ViewData["Title"]</h1>
 
-<div>
-    <h3>Informações do Utilizador</h3>
-    <p><strong>Nome:</strong> @Model.Nome</p>
-    <p><strong>Telemóvel:</strong> @Model.Telemovel</p>
-    <p><strong>Email:</strong> @Model.Email</p>
-    <p><strong>Data de Nascimento:</strong> @Model.DataNascimento.ToString("dd/MM/yyyy")</p>
-    <p><strong>Cidade:</strong> @Model.Cidade</p>
-    <p><strong>Pais:</strong> @Model.Pais</p>
-    <a asp-action="EditProfile" class="btn btn-primary">Editar Perfil</a>
-</div>
+    <!-- Seção de Informações do Usuário -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body text-center">
+            <h3 class="card-title">@Model.Nome</h3>
+            <p><i class="fas fa-envelope"></i> @Model.Email</p>
+            <p><i class="fas fa-phone"></i> @Model.Telemovel</p>
+            <a asp-action="EditProfile" class="btn btn-primary">
+                <i class="fas fa-user-edit"></i> Editar Perfil
+            </a>
+        </div>
+    </div>
 
-<div>
-    <h3>Minhas Candidaturas</h3>
-    @if (Model.Candidaturas != null && Model.Candidaturas.Any())
-    {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Vaga</th>
-                    <th>Estado</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var candidatura in Model.Candidaturas)
-                {
-                    <tr>
-                        <td>@candidatura.Vaga.Nome</td>
-                        <td>@candidatura.Estado</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <p>Você ainda não se candidatou a nenhuma vaga.</p>
-    }
+    <!-- Seção de Detalhes Adicionais e Candidaturas -->
+    <div class="row">
+        <!-- Detalhes Adicionais -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Informações Adicionais</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>Data de Nascimento:</strong> @Model.DataNascimento.ToString("dd/MM/yyyy")</p>
+                    <p><strong>Cidade:</strong> @Model.Cidade</p>
+                    <p><strong>País:</strong> @Model.Pais</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Minhas Candidaturas -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Minhas Candidaturas</h4>
+                </div>
+                <div class="card-body">
+                    @if (Model.Candidaturas != null && Model.Candidaturas.Any())
+                    {
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Vaga</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var candidatura in Model.Candidaturas)
+                                {
+                                    <tr>
+                                        <td>@candidatura.Vaga.Nome</td>
+                                        <td>
+                                            @if (candidatura.Estado == "Pendente")
+                                            {
+                                                <span class="badge bg-warning text-dark">Pendente</span>
+                                            }
+                                            else if (candidatura.Estado == "Aceite")
+                                            {
+                                                <span class="badge bg-success">Aceite</span>
+                                            }
+                                            else if (candidatura.Estado == "Rejeitada")
+                                            {
+                                                <span class="badge bg-danger">Rejeitada</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p>Você ainda não se candidatou a nenhuma vaga.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
