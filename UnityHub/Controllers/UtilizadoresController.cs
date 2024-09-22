@@ -53,65 +53,7 @@ namespace UnityHub.Controllers
             return View(utilizadores);
         }
 
-        // Método GET para exibir o formulário de edição de um utilizador específico (apenas para administradores)
-        [Authorize(Roles = "admin")]
-        public async Task<IActionResult> Edit(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var utilizadores = await _context.Utilizadores.FindAsync(id);
-            if (utilizadores == null)
-            {
-                return NotFound();
-            }
-
-            // Verifica se o usuário é o administrador e impede a edição
-            if (utilizadores.UserName == "admin@UnityHub.pt")
-            {
-                return Forbid();
-            }
-
-            return View(utilizadores);
-        }
-
-        // Método POST para editar um utilizador específico (apenas para administradores)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "admin")]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,Nome,Telemovel,Email,DataNascimento,Cidade,Pais")] Utilizadores utilizadores)
-        {
-            if (id != utilizadores.Id)
-            {
-                return NotFound();
-            }
-
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(utilizadores);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UtilizadoresExists(utilizadores.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(utilizadores);
-        }
-
+ 
         // Método GET para exibir o formulário de eliminação de um utilizador específico (apenas para administradores)
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(string id)
@@ -250,6 +192,8 @@ namespace UnityHub.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+
+
         // Método GET para exibir o formulário de edição de perfil
         [HttpGet]
         [Authorize]
@@ -296,7 +240,6 @@ namespace UnityHub.Controllers
             user.DataNascimento = model.DataNascimento;
             user.Cidade = model.Cidade;
             user.Pais = model.Pais;
-            user.Email = model.Email;
 
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
@@ -310,5 +253,50 @@ namespace UnityHub.Controllers
 
             return RedirectToAction("Perfil");
         }
+
+        // Método GET para exibir o formulário de criação de um novo administrador
+        [Authorize(Roles = "admin")]
+        public IActionResult CreateAdmin()
+        {
+            return View();
+        }
+
+        // Método POST para criar um novo utilizador administrador
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> CreateAdmin(RegisterViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                // Criação de um novo utilizador
+                var utilizador = new Utilizadores
+                {
+                    UserName = model.Email,
+                    Email = model.Email,
+                    Nome = model.Nome,
+                    Telemovel = model.Telemovel,
+                    DataNascimento = model.DataNascimento,
+                    Cidade = model.Cidade,
+                    Pais = model.Pais
+                };
+
+                // Criação do utilizador no UserManager
+                var result = await _userManager.CreateAsync(utilizador, model.Password);
+                if (result.Succeeded)
+                {
+                    // Atribui a role "admin" ao utilizador
+                    await _userManager.AddToRoleAsync(utilizador, "admin");
+
+                    return RedirectToAction(nameof(Index));
+                }
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+            }
+            return View(model);
+        }
+
     }
 }

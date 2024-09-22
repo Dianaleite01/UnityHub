@@ -19,6 +19,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddMemoryCache();
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("admin"));
+});
+
 // Configura��o dos servi�os de identidade
 builder.Services.AddDefaultIdentity<Utilizadores>(options =>
 {
