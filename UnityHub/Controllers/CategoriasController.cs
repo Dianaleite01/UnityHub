@@ -18,6 +18,7 @@ namespace UnityHub.Controllers
         // GET: Categorias
         public async Task<IActionResult> Index()
         {
+            // procura todas as categorias do banco de dados e exibe na view
             return View(await _context.Categorias.ToListAsync());
         }
 
@@ -29,8 +30,11 @@ namespace UnityHub.Controllers
                 return NotFound();
             }
 
+            // procura a categoria pelo ID no banco de dados
             var categorias = await _context.Categorias
                 .FirstOrDefaultAsync(m => m.Id == id);
+            
+            // Verifica se a categoria foi encontrada
             if (categorias == null)
             {
                 return NotFound();
@@ -53,6 +57,7 @@ namespace UnityHub.Controllers
             {
                 try
                 {
+                    // Adiciona a nova categoria À BD
                     _context.Add(categorias);
                     await _context.SaveChangesAsync();
                     Console.WriteLine("Categoria criada com sucesso: " + categorias.Nome);
@@ -98,6 +103,7 @@ namespace UnityHub.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Nome")] Categorias categorias)
         {
+            // Verifica se o ID no parâmetro é o mesmo da categoria fornecida
             if (id != categorias.Id)
             {
                 return NotFound();
@@ -107,6 +113,7 @@ namespace UnityHub.Controllers
             {
                 try
                 {
+                    // Atualiza a categoria na BD
                     _context.Update(categorias);
                     await _context.SaveChangesAsync();
                 }
@@ -150,6 +157,7 @@ namespace UnityHub.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var categorias = await _context.Categorias.FindAsync(id);
+            // Se a categoria for encontrada, remove-a da BD
             if (categorias != null)
             {
                 _context.Categorias.Remove(categorias);

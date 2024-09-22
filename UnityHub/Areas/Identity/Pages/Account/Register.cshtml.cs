@@ -82,11 +82,15 @@ namespace UnityHub.Areas.Identity.Pages.Account
             ReturnUrl = returnUrl;
         }
 
+        //método executado ao submeter o formulário de registo
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
+
+            //verificar se os dados do formulário estão válidos
             if (ModelState.IsValid)
             {
+                //cria um novo objeto de utilizador com os dados fornecidos no formulário
                 var user = new Utilizadores
                 {
                     UserName = Input.Email,

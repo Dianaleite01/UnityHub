@@ -19,8 +19,10 @@ namespace UnityHub.Controllers
         }
 
         // GET: Home
+        //Método GET para carregar a página inicial. Ele procura todas as vagas e suas respectivas categorias da BD
         public async Task<IActionResult> Index()
         {
+            // Inclui as categorias associadas a cada vaga (usando relacionamentos do Entity Framework) e retorna a lista de vagas à view.
             var vagas = await _context.Vagas.Include(v => v.VagasCategorias)
                                             .ThenInclude(vc => vc.Categoria)
                                             .ToListAsync();
@@ -28,6 +30,7 @@ namespace UnityHub.Controllers
         }
 
         // GET: Home/Details/5
+        // Método GET para exibir detalhes de uma vaga específica. O acesso é restrito apenas para utilizadores autenticados.
         [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
@@ -36,6 +39,7 @@ namespace UnityHub.Controllers
                 return NotFound();
             }
 
+            // procura a vaga na BD, incluindo as categorias associadas a ela.
             var vaga = await _context.Vagas
                 .Include(v => v.VagasCategorias)
                 .ThenInclude(vc => vc.Categoria)
@@ -48,17 +52,20 @@ namespace UnityHub.Controllers
             return View(vaga);
         }
 
+        // Método GET para exibir a página "Sobre" do site. Apenas retorna uma view simples.
         public IActionResult About()
         {
             ViewData["Title"] = "Sobre";
             return View();
         }
 
+        // Método GET para exibir a página de contato. Apenas retorna uma view simples.
         public IActionResult Contact()
         {
             return View();
         }
 
+        // Método GET para exibir a página de política de privacidade.
         public IActionResult Privacy()
         {
             return View();

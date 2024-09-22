@@ -68,7 +68,7 @@ namespace UnityHub.Controllers
                 return NotFound();
             }
 
-            // Verifica se o usuário é o administrador e impede a edição
+            // Verifica se o utilizador é o administrador e impede a edição
             if (utilizadores.UserName == "admin@UnityHub.pt")
             {
                 return Forbid();
@@ -128,7 +128,7 @@ namespace UnityHub.Controllers
                 return NotFound();
             }
 
-            // Verifica se o usuário é o administrador e impede a eliminação
+            // Verifica se o utilizador é o administrador e impede a eliminação
             if (utilizadores.UserName == "admin@UnityHub.pt")
             {
                 return Forbid();
@@ -145,7 +145,7 @@ namespace UnityHub.Controllers
         {
             var utilizadores = await _context.Utilizadores.FindAsync(id);
 
-            // Verifica se o usuário é o administrador e impede a eliminação
+            // Verifica se o utilizador é o administrador e impede a eliminação
             if (utilizadores.UserName == "admin@UnityHub.pt")
             {
                 return Forbid();
@@ -194,7 +194,7 @@ namespace UnityHub.Controllers
                 return NotFound();
             }
 
-            // Busca as candidaturas do utilizador
+            // procura as candidaturas do utilizador
             var candidaturas = await _context.Candidaturas
                 .Include(c => c.Vaga)
                 .Where(c => c.UtilizadorFK == user.Id)
@@ -252,15 +252,17 @@ namespace UnityHub.Controllers
 
         // Método GET para exibir o formulário de edição de perfil
         [HttpGet]
-        [Authorize]
+        [Authorize] // Apenas utilizadores autenticados podem aceder este método
         public async Task<IActionResult> EditProfile()
         {
+            //Obtém o utilizador autenticado a partir do contexto de seguranç
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return NotFound();
             }
 
+            // Preenche o modelo de visualização com os dados atuais do utilizador
             var model = new ProfileViewModel
             {
                 Nome = user.Nome,
@@ -291,6 +293,7 @@ namespace UnityHub.Controllers
                 return NotFound();
             }
 
+            // Atualiza os dados do utilizador autenticado com os valores recebidos do formulário
             user.Nome = model.Nome;
             user.Telemovel = model.Telemovel;
             user.DataNascimento = model.DataNascimento;

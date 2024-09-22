@@ -25,6 +25,7 @@ namespace UnityHub.Controllers
         // GET: Vagas
         public async Task<IActionResult> Index()
         {
+            //vai procurar todas as vagas e respetivas categorias a BD
             var applicationDbContext = _context.Vagas.Include(v => v.VagasCategorias);
             return View(await applicationDbContext.ToListAsync());
         }
@@ -37,6 +38,7 @@ namespace UnityHub.Controllers
                 return NotFound();
             }
 
+            // procura a vaga pelo ID, incluindo suas categorias relacionadas
             var vaga = await _context.Vagas
                 .Include(v => v.VagasCategorias)
                     .ThenInclude(vc => vc.Categoria)
@@ -53,6 +55,7 @@ namespace UnityHub.Controllers
         // GET: Vagas/Create
         public IActionResult Create()
         {
+            // Prepara uma lista de categorias disponíveis para serem selecionadas no formulário
             ViewBag.Categorias = _context.Categorias.Select(c => new SelectListItem
             {
                 Value = c.Id.ToString(),
@@ -71,11 +74,14 @@ namespace UnityHub.Controllers
 
             if (ModelState.IsValid)
             {
+                //se uma imagem foi carregada
                 if (foto != null && foto.Length > 0)
                 {
+                    // Gera um nome único para a imagem e define o caminho deonde foi guardado
                     string fileName = Guid.NewGuid().ToString() + "_" + foto.FileName;
                     string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", fileName);
 
+                    // Salva a imagem no diretório especificado
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
                         await foto.CopyToAsync(fileStream);
@@ -85,6 +91,7 @@ namespace UnityHub.Controllers
                 }
                 else
                 {
+                    // Caso a imagem não seja fornecida, adiciona um erro ao estado do modelo
                     ModelState.AddModelError("Foto", "O campo Fotografia é obrigatório.");
                     ViewBag.Categorias = _context.Categorias.Select(c => new SelectListItem
                     {
@@ -94,6 +101,7 @@ namespace UnityHub.Controllers
                     return View(vagas);
                 }
 
+                // Associa as categorias selecionadas à vaga
                 vagas.VagasCategorias = vagas.CategoriaIds
                     .Select(id => new VagaCategoria { CategoriaId = id, Vaga = vagas })
                     .ToList();
@@ -119,13 +127,16 @@ namespace UnityHub.Controllers
                 return NotFound();
             }
 
+            // procura a vaga pelo ID, incluindo suas categorias
             var vagas = await _context.Vagas.Include(v => v.VagasCategorias).FirstOrDefaultAsync(m => m.Id == id);
             if (vagas == null)
             {
                 return NotFound();
             }
 
+            // Preenche a lista de IDs de categorias associadas à vaga
             vagas.CategoriaIds = vagas.VagasCategorias.Select(vc => vc.CategoriaId).ToList();
+            // Prepara a lista de categorias para o formulário
             ViewBag.Categorias = _context.Categorias.Select(c => new SelectListItem
             {
                 Value = c.Id.ToString(),
@@ -151,6 +162,7 @@ namespace UnityHub.Controllers
             {
                 try
                 {
+                    // procura a vaga existente no banco de dados
                     var existingVagas = await _context.Vagas
                         .Include(v => v.VagasCategorias)
                         .FirstOrDefaultAsync(v => v.Id == id);
@@ -159,6 +171,7 @@ namespace UnityHub.Controllers
                         return NotFound();
                     }
 
+                    // Se uma nova imagem for carregada
                     if (foto != null && foto.Length > 0)
                     {
                         string fileName = Guid.NewGuid().ToString() + "_" + foto.FileName;
@@ -172,11 +185,13 @@ namespace UnityHub.Controllers
                         existingVagas.Fotografia = fileName;
                     }
 
+                    // Atualiza os campos da vaga com os novos dados fornecidos
                     existingVagas.Nome = vagas.Nome;
                     existingVagas.PeriodoVoluntariado = vagas.PeriodoVoluntariado;
                     existingVagas.Local = vagas.Local;
                     existingVagas.Descricao = vagas.Descricao;
 
+                    // Remove as antigas categorias associadas e associa as novas
                     existingVagas.VagasCategorias.Clear();
                     foreach (var categoriaId in vagas.CategoriaIds)
                     {

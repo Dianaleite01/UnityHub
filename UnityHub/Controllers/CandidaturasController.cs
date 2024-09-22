@@ -28,11 +28,12 @@ namespace UnityHub.Controllers
         // GET: Candidaturas
         public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10)
         {
+            //vai procurar as candidaturas com dados relacionados (utilizador e vagas)
             var applicationDbContext = _context.Candidaturas
                 .Include(c => c.Utilizador)
                 .Include(c => c.Vaga)
                 .AsNoTracking();
-
+            //limitar a quantidade de dados - a paginaçao
             var pagedData = await applicationDbContext
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
@@ -45,6 +46,7 @@ namespace UnityHub.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> All(int pageNumber = 1, int pageSize = 10)
         {
+            //vai procurar todas as candidaturas com as suas vagas e utilizadores
             var candidaturas = await _context.Candidaturas
                 .Include(c => c.Vaga)
                 .Include(c => c.Utilizador)
@@ -61,6 +63,7 @@ namespace UnityHub.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(int VagaFK)
         {
+            //obtem o utilizador autenticado
             var user = await _userManager.GetUserAsync(User);
 
             if (user == null)
@@ -87,6 +90,7 @@ namespace UnityHub.Controllers
                 return RedirectToAction("Details", "Home", new { id = VagaFK });
             }
 
+            //cria uma nova candidatura com o estado pendente
             var candidatura = new Candidaturas
             {
                 UtilizadorFK = user.Id,
@@ -112,11 +116,13 @@ namespace UnityHub.Controllers
                 return NotFound();
             }
 
+            //vai procurar a candidatura pelo ID
             var candidaturas = await _context.Candidaturas.FindAsync(id);
             if (candidaturas == null)
             {
                 return NotFound();
             }
+            //prepara as listas de seleção para utilizador e vaga, para exibir no formulario
             ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Nome", candidaturas.UtilizadorFK);
             ViewData["VagaFK"] = new SelectList(_context.Vagas, "Id", "Nome", candidaturas.VagaFK);
             return View(candidaturas);
@@ -136,6 +142,7 @@ namespace UnityHub.Controllers
             {
                 try
                 {
+                    //atualiza a candidatura
                     _context.Update(candidaturas);
                     await _context.SaveChangesAsync();
                 }
@@ -152,6 +159,7 @@ namespace UnityHub.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            //em caso de erro vai carregas as listas de seleção e retorna a view
             ViewData["UtilizadorFK"] = new SelectList(_context.Utilizadores, "Id", "Nome", candidaturas.UtilizadorFK);
             ViewData["VagaFK"] = new SelectList(_context.Vagas, "Id", "Nome", candidaturas.VagaFK);
             return View(candidaturas);
@@ -163,12 +171,14 @@ namespace UnityHub.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> Accept(int id)
         {
+            //vai procurar a candidatura pelo ID
             var candidatura = await _context.Candidaturas.FindAsync(id);
             if (candidatura == null)
             {
                 return NotFound();
             }
 
+            //atualiza o estado da candidatura para aceite
             candidatura.Estado = "Aceite";
             _context.Update(candidatura);
             await _context.SaveChangesAsync();
@@ -182,12 +192,14 @@ namespace UnityHub.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> Reject(int id)
         {
+            //procurar a candidatura pelo ID
             var candidatura = await _context.Candidaturas.FindAsync(id);
             if (candidatura == null)
             {
                 return NotFound();
             }
 
+            //atualiza o estado para rejeitada
             candidatura.Estado = "Rejeitada";
             _context.Update(candidatura);
             await _context.SaveChangesAsync();
@@ -203,6 +215,7 @@ namespace UnityHub.Controllers
                 return NotFound();
             }
 
+            //vai procurar a candidatura pelo ID, incluindo as suas relacoes com utilizadores e vagas
             var candidaturas = await _context.Candidaturas
                 .Include(c => c.Utilizador)
                 .Include(c => c.Vaga)

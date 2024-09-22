@@ -27,6 +27,7 @@ namespace UnityHub.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Candidaturas>>> GetCandidaturas()
         {
+            //vai procurar todas as candidaturas, incluindo os dados relacionados com a mesma
             return await _context.Candidaturas
                 .Include(c => c.Utilizador)
                 .Include(c => c.Vaga)
@@ -38,6 +39,7 @@ namespace UnityHub.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Candidaturas>> GetCandidaturas(int id)
         {
+            //vai procurar todas as candidaturas pelo ID
             var candidatura = await _context.Candidaturas
                 .Include(c => c.Utilizador)
                 .Include(c => c.Vaga)
@@ -56,13 +58,14 @@ namespace UnityHub.Controllers
         [HttpPost("Create")]
         public async Task<ActionResult<Candidaturas>> CreateCandidatura([FromBody] CreateCandidaturaRequest request)
         {
+            //procura o utilizador pelo email fornecido
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
                 return Unauthorized();
             }
 
-            // Verificação para garantir que o administrador não se candidate a uma vaga
+            // Verificação para garantir que o administrador não se candidata a uma vaga
             if (await _userManager.IsInRoleAsync(user, "admin"))
             {
                 return BadRequest("Administradores não podem candidatar-se a vagas.");
@@ -72,11 +75,13 @@ namespace UnityHub.Controllers
             var existingCandidatura = await _context.Candidaturas
                 .FirstOrDefaultAsync(c => c.UtilizadorFK == user.Id && c.VagaFK == request.VagaFK);
 
+            // se o utilizador já se candidatou a esta vaga vai aparecer essa mensagem
             if (existingCandidatura != null)
             {
                 return BadRequest("Já se candidatou a esta vaga.");
             }
 
+            //criar nova candidatura com estado pendente
             var candidatura = new Candidaturas
             {
                 UtilizadorFK = user.Id,
@@ -86,8 +91,9 @@ namespace UnityHub.Controllers
 
             if (ModelState.IsValid)
             {
-                _context.Candidaturas.Add(candidatura);
-                await _context.SaveChangesAsync();
+                _context.Candidaturas.Add(candidatura); //adiciona ao contexto
+                await _context.SaveChangesAsync(); //salva na BD
+                //retorna a nova candadatura
                 return CreatedAtAction(nameof(GetCandidaturas), new { id = candidatura.Id }, candidatura);
             }
 
@@ -109,12 +115,14 @@ namespace UnityHub.Controllers
                 return BadRequest();
             }
 
+            //obtem o utilizaor autenticado
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return Unauthorized();
             }
 
+            //marca a candidatura como modificado no contexto
             _context.Entry(candidatura).State = EntityState.Modified;
 
             try
@@ -140,12 +148,14 @@ namespace UnityHub.Controllers
         [HttpPost("accept/{id}")]
         public async Task<IActionResult> AcceptCandidatura(int id)
         {
+            //vai procurar a candidatura pelo ID
             var candidatura = await _context.Candidaturas.FindAsync(id);
             if (candidatura == null)
             {
                 return NotFound();
             }
 
+            //define o estado da candidatura
             candidatura.Estado = "Aceite";
             _context.Entry(candidatura).State = EntityState.Modified;
             await _context.SaveChangesAsync();
@@ -157,12 +167,14 @@ namespace UnityHub.Controllers
         [HttpPost("reject/{id}")]
         public async Task<IActionResult> RejectCandidatura(int id)
         {
+            //vai procurar a candidatura pelo ID
             var candidatura = await _context.Candidaturas.FindAsync(id);
             if (candidatura == null)
             {
                 return NotFound();
             }
 
+            //define o estado como rejeitada
             candidatura.Estado = "Rejeitada";
             _context.Entry(candidatura).State = EntityState.Modified;
             await _context.SaveChangesAsync();
@@ -174,12 +186,14 @@ namespace UnityHub.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCandidatura(int id)
         {
+            //vai procurar a candidatura pelo ID
             var candidatura = await _context.Candidaturas.FindAsync(id);
             if (candidatura == null)
             {
                 return NotFound();
             }
 
+            //remove a candidatura
             _context.Candidaturas.Remove(candidatura);
             await _context.SaveChangesAsync();
 
